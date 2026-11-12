@@ -188,10 +188,16 @@ pub(crate) fn restyle_edit(
                         for run in &runs {
                             let range = byte(run.chars.start)..byte(run.chars.end);
                             let (color, size) = (change.color.is_none().then_some(run.color), change.size.is_none().then_some(run.size));
-                            if range.start < range.end && (color.is_some() || size.is_some()) {
+                            // A weight or slant not asked for stays each part's own (Thai edition):
+                            // italic for all of "Dell Latitude" with "Latitude" bold kept it bold.
+                            let family = style
+                                .family
+                                .map(|(f, _, _)| (f, change.bold.unwrap_or(run.bold), change.italic.unwrap_or(run.italic)))
+                                .filter(|own| Some(*own) != style.family);
+                            if range.start < range.end && (color.is_some() || size.is_some() || family.is_some()) {
                                 style.ranges.push(pdfcraft_engine::RangeStyle {
                                     range,
-                                    family: None,
+                                    family,
                                     resource: None,
                                     size,
                                     color,
@@ -727,6 +733,41 @@ startxref
             widths.push(b.rect[2] - b.rect[0]);
         }
         assert!((widths[0] - widths[1]).abs() < 0.5, "plain and mixed alike: {widths:?}");
+    }
+
+    /// Thai edition: Italic for all of "Dell Latitude 5440", with "Dell" red and "Latitude" green and
+    /// bold, makes every part italic and keeps "Latitude" bold. The weight was taken from the first
+    /// part for all of them: "Latitude" lost its bold, or was drawn in another face.
+    #[test]
+    fn italic_for_a_mixed_paragraph_keeps_a_bold_part_bold() {
+        let mut s = pdfcraft_engine::Session::new();
+        let pdf = s.create_from_images(&[("scan.png".into(), pdfcraft_engine::export::encode_png(2, 2, &[200; 16]).unwrap())]).unwrap();
+        let id = s.open("scan.pdf", None, pdf, None).unwrap();
+        let text = AddedText {
+            text: "Dell Latitude 5440".into(),
+            rect: [10.0, 10.0, 300.0, 30.0],
+            family: pdfcraft_engine::FontFamily::Times,
+            size: 14.0,
+            ..Default::default()
+        };
+        let (red, green) = ([0.9, 0.1, 0.1], [0.1, 0.6, 0.3]);
+        let runs = vec![
+            pdfcraft_engine::TextRun { chars: 0..5, color: red, size: 14.0, ..Default::default() },
+            pdfcraft_engine::TextRun { chars: 5..13, color: green, size: 14.0, bold: true, ..Default::default() },
+            pdfcraft_engine::TextRun { chars: 13..18, color: [0.0; 3], size: 14.0, ..Default::default() },
+        ];
+        s.apply(id, Edit::AddStyledText { page: 0, text, runs }).unwrap();
+        let lines = s.get(id).unwrap().text_lines(0);
+        assert!(lines.iter().any(|l| l.text.contains("Latitude") && l.bold), "set up bold: {lines:?}");
+        let target = [ObjectTarget { kind: ObjectKind::Text, index: 0 }];
+        let edit = restyle_edit(s.get(id).unwrap(), 0, &target, &LookPreview { italic: Some(true), ..Default::default() }, None).unwrap();
+        s.apply(id, edit).unwrap();
+        let lines = s.get(id).unwrap().text_lines(0);
+        let line = |w: &str| lines.iter().find(|l| l.text.contains(w)).unwrap_or_else(|| panic!("{w}: {lines:?}"));
+        assert!(lines.iter().filter(|l| !l.text.trim().is_empty()).all(|l| l.italic), "all italic: {lines:?}");
+        assert!(line("Latitude").bold && !line("Dell").bold && !line("5440").bold, "only Latitude bold: {lines:?}");
+        assert_eq!((line("Dell").color, line("Latitude").color), (red, green), "colours kept: {lines:?}");
+        assert!((line("Latitude").size - 14.0).abs() < 0.1, "its size: {lines:?}");
     }
 
     /// Thai edition: a paragraph of several colours set in an installed font (whose widths aren't

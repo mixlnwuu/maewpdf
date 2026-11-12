@@ -327,10 +327,14 @@ impl LineEditor {
             for run in paragraph_runs(block, lines) {
                 let range = byte(run.chars.start)..byte(run.chars.end);
                 let (color, size) = (style.color.is_none().then_some(run.color), style.size.is_none().then_some(run.size));
-                if range.start < range.end && (color.is_some() || size.is_some()) {
+                // A weight or slant not changed stays each part's own: italic for all of "Dell
+                // Latitude" with "Latitude" bold kept it bold.
+                let (bold, italic) = (if l.bold != o.bold { l.bold } else { run.bold }, if l.italic != o.italic { l.italic } else { run.italic });
+                let family = style.family.map(|(f, _, _)| (f, bold, italic)).filter(|own| Some(*own) != style.family);
+                if range.start < range.end && (color.is_some() || size.is_some() || family.is_some()) {
                     style.ranges.push(pdfcraft_engine::RangeStyle {
                         range,
-                        family: None,
+                        family,
                         resource: None,
                         size,
                         color,
@@ -1411,6 +1415,66 @@ C", &picked
         // Move by -10° (to 35°):
         let p_35 = c + egui::vec2(r * 35.0_f32.to_radians().sin(), -r * 35.0_f32.to_radians().cos());
         assert!((turn_degrees_delta(c, start, p_35, false) + 10.0).abs() < 1e-2);
+    }
+
+    /// Thai edition: with "Dell Latitude 5440" open for typing ("Dell" red, "Latitude" green and
+    /// bold), Italic for all of it makes every part italic and keeps "Latitude" bold. Each part
+    /// was given the first part's weight: "Latitude" lost its bold, or was drawn in another face.
+    #[test]
+    fn italic_for_an_open_paragraph_keeps_a_bold_part_bold() {
+        let mut s = pdfcraft_engine::Session::new();
+        let pdf = s.create_from_images(&[("scan.png".into(), pdfcraft_engine::export::encode_png(2, 2, &[200; 16]).unwrap())]).unwrap();
+        let id = s.open("scan.pdf", None, pdf, None).unwrap();
+        let text = pdfcraft_engine::AddedText {
+            text: "Dell Latitude 5440".into(),
+            rect: [10.0, 10.0, 300.0, 30.0],
+            family: pdfcraft_engine::FontFamily::Times,
+            size: 14.0,
+            ..Default::default()
+        };
+        let (red, green) = ([0.9, 0.1, 0.1], [0.1, 0.6, 0.3]);
+        let runs = vec![
+            pdfcraft_engine::TextRun { chars: 0..5, color: red, size: 14.0, ..Default::default() },
+            pdfcraft_engine::TextRun { chars: 5..13, color: green, size: 14.0, bold: true, ..Default::default() },
+            pdfcraft_engine::TextRun { chars: 13..18, color: [0.0; 3], size: 14.0, ..Default::default() },
+        ];
+        s.apply(id, pdfcraft_engine::Edit::AddStyledText { page: 0, text, runs }).unwrap();
+        let doc = s.get(id).unwrap();
+        let block = doc.text_blocks(0).remove(0);
+        let lines = doc.text_lines(0);
+        let mut ed = LineEditor {
+            selection: None,
+            font_resource: None,
+            page: 0,
+            block: 0,
+            text: block.editor_text.clone(),
+            original: block.editor_text.clone(),
+            rect: Rect::NOTHING,
+            source_rect: block.rect.map(|v| v as f32),
+            multiline: block.rows.len() > 1,
+            source: Some((block.clone(), lines)),
+            fonts: BTreeMap::new(),
+            overflow: false,
+            max_width: 400.0,
+            size: block.size as f32,
+            focus: true,
+            had_focus: false,
+            look: look_of(&block),
+            look0: look_of(&block),
+            family_chosen: false,
+            size_chosen: false,
+            extras: Extras::default(),
+            extras0: Extras::default(),
+            typing_from: None,
+        };
+        ed.look.italic = true;
+        let style = ed.style();
+        s.apply(id, pdfcraft_engine::Edit::EditTextBlock { page: 0, block: 0, text: ed.text.clone(), style }).unwrap();
+        let lines = s.get(id).unwrap().text_lines(0);
+        let line = |w: &str| lines.iter().find(|l| l.text.contains(w)).unwrap_or_else(|| panic!("{w}: {lines:?}"));
+        assert!(lines.iter().filter(|l| !l.text.trim().is_empty()).all(|l| l.italic), "all italic: {lines:?}");
+        assert!(line("Latitude").bold && !line("Dell").bold && !line("5440").bold, "only Latitude bold: {lines:?}");
+        assert_eq!((line("Dell").color, line("Latitude").color), (red, green), "colours kept: {lines:?}");
     }
 
     /// An app with one text document open, and an editor on its first paragraph.
