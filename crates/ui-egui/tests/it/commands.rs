@@ -539,7 +539,8 @@ fn the_about_dialog_shows_the_running_version() {
     h.get_by_label_contains(&format!("Version {}", pdfcraft_engine::build_info::edition_version()));
     // The Thai edition's credit names its developer, beside its mark.
     h.get_by_label_contains("Non.sittith");
-    h.get_by_label("MaewPDF");
+    // The app's name heads the dialog, and the mark beside the credit is described by it too.
+    assert_eq!(h.get_all_by_label("MaewPDF").count(), 2);
 }
 
 /// Check that the quit shortcut needs exact platform modifiers and that unsaved work opens the save prompt

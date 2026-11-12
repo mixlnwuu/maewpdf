@@ -21,7 +21,8 @@ use crate::{PdfCraftApp, RightPanel};
 pub(super) mod tab_context;
 
 /// The app's name in the menus the layouts write (About, Hide, Quit).
-pub(crate) const APP_NAME: &str = "PdfCraft";
+/// The app's name as people see it: window titles, About, the update window and the macOS app menu.
+pub(crate) const APP_NAME: &str = "MaewPDF";
 
 /// The top bar's width after the menus: the mode tabs, the search box and the buttons.
 const ROW_AFTER_MENUS: f32 = 720.0;

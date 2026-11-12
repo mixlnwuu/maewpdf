@@ -316,7 +316,7 @@ fn prompt(app: &mut PdfCraftApp, ctx: &egui::Context) {
             crate::thai_edition_mark(ui, 56.0);
             ui.add_space(8.0);
             ui.vertical(|ui| {
-                ui.label(egui::RichText::new("PdfCraft").font(theme::semibold(18.0)));
+                ui.label(egui::RichText::new(crate::menus::APP_NAME).font(theme::semibold(18.0)));
                 ui.label(egui::RichText::new(format!("v{current} \u{2192} {version}")).monospace().color(t.text_muted));
             });
         });
