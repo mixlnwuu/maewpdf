@@ -41,6 +41,8 @@ mod decorations;
 mod logging;
 #[cfg(target_os = "windows")]
 mod motion;
+#[cfg_attr(not(windows), allow(dead_code))]
+mod old_edition;
 mod reopen;
 mod settings;
 mod single_instance;
@@ -293,6 +295,15 @@ fn main() -> eframe::Result {
         single_instance::Claim::Primary(server) => Some(server),
         single_instance::Claim::Alone => None,
     };
+    // MaewPDF: remove PdfCraft Thai Edition, which it replaces and its installer can't (src/old_edition.rs).
+    // Never for an automated launch (--control) or a portable copy, which leaves installs alone.
+    #[cfg(windows)]
+    if control_file.is_none()
+        && pdfcraft_ui_egui::portable::data_dir().is_none()
+        && let Some(dir) = eframe::storage_dir(pdfcraft_ui_egui::portable::APP_DIR)
+    {
+        old_edition::remove(&dir.join("old-edition-removal"));
+    }
     let choice = renderer_choice(std::env::var("PDFCRAFT_RENDERER").ok().as_deref());
     let launch = Launch { files, options, control_file, create_images, combine, integrated, window_controls, two_paged };
     // Finder, Open With and the Dock deliver files as Apple events, not arguments; catch the one
