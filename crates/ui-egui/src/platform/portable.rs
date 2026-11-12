@@ -1,7 +1,7 @@
 //! Portable mode (#157): a marker file beside the executable ([`MARKERS`]) keeps the settings,
-//! log files, crash-recovery autosaves and new digital IDs in `<exe dir>/PdfCraftData`, so a
+//! log files, crash-recovery autosaves and new digital IDs in `<exe dir>/MaewPDFData`, so a
 //! portable copy (on a USB stick, say) writes nothing to `%APPDATA%`. In `%LOCALAPPDATA%` it keeps
-//! only its single-instance socket and lock, two empty files in `%LOCALAPPDATA%\PdfCraft` that
+//! only its single-instance socket and lock, two empty files in `%LOCALAPPDATA%\MaewPDF` that
 //! must stay private to the user (#889, `apps/pdfcraft/src/single_instance.rs`). The Windows
 //! portable zip ships with `portable.txt`; the MSI doesn't. PhotoCraft uses the same scheme
 //! (`photocraft/apps/photocraft/src/app_dirs.rs`).
@@ -13,14 +13,23 @@ use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
 /// Files beside the executable that switch on portable mode (either one; contents are ignored).
-pub const MARKERS: [&str; 2] = ["portable.txt", "PdfCraft.portable"];
+pub const MARKERS: [&str; 2] = ["portable.txt", "MaewPDF.portable"];
 /// The data folder created beside the executable in portable mode.
-pub const DATA_DIR: &str = "PdfCraftData";
+pub const DATA_DIR: &str = "MaewPDFData";
+/// The per-user folder name (`%APPDATA%\MaewPDF`, `%LOCALAPPDATA%\MaewPDF`). MaewPDF keeps its
+/// own, never official PdfCraft's `PdfCraft`, so the two install side by side without sharing
+/// settings, recovery files or the single-instance socket.
+pub const APP_DIR: &str = "MaewPDF";
+/// [`APP_DIR`] for the lower-case XDG folders on Linux and the BSDs.
+pub const APP_DIR_LOWER: &str = "maewpdf";
+/// Official PdfCraft's per-user folder name, which PdfCraft Thai Edition used too; MaewPDF
+/// copies settings from it once (never moves them: official PdfCraft may still use it).
+pub const OFFICIAL_APP_DIR: &str = "PdfCraft";
 
 /// The outcome of looking for a portable marker.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Portable {
-    /// `<exe dir>/PdfCraftData` when portable mode is on, `None` otherwise.
+    /// `<exe dir>/MaewPDFData` when portable mode is on, `None` otherwise.
     pub dir: Option<PathBuf>,
     /// Set when a marker was found but its data folder can't be written.
     pub unwritable: Option<Unwritable>,

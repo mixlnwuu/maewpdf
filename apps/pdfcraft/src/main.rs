@@ -93,10 +93,10 @@ fn print_and_exit(text: &str) -> eframe::Result {
 const LEGACY_STORAGE_KEY: &str = "printcraft";
 
 /// The preferences folder (`app.ron`, docs/development.md). In portable mode
-/// it is `PdfCraftData` beside the executable (#157). XDG desktops use the configuration base;
+/// it is `MaewPDFData` beside the executable (#157). XDG desktops use the configuration base;
 /// other platforms retain eframe's PdfCraft folder. Logs and recovery stay in the data folder.
 fn settings_dir() -> Option<std::path::PathBuf> {
-    let legacy = eframe::storage_dir("PdfCraft");
+    let legacy = eframe::storage_dir(pdfcraft_ui_egui::portable::APP_DIR);
     match settings::directory(
         cfg!(all(unix, not(target_os = "macos"))),
         pdfcraft_ui_egui::portable::data_dir(),
@@ -137,6 +137,33 @@ fn migrate_legacy_folders() {
         match std::fs::rename(&old, &new) {
             Ok(()) => log::info!("moved {} to {}", old.display(), new.display()),
             Err(e) => log::warn!("moving {} to {}: {e}", old.display(), new.display()),
+        }
+    }
+}
+
+/// MaewPDF's first start: copy the settings, spelling dictionaries and digital IDs that PdfCraft
+/// Thai Edition kept in official PdfCraft's folders into MaewPDF's own ([`settings::copy_once`]),
+/// so recent files and preferences come along while official PdfCraft keeps its own. Crash
+/// recovery files and logs stay behind: they belong to the app that wrote them. A portable copy
+/// leaves the per-user folders alone. Best effort, like [`migrate_legacy_folders`].
+fn copy_official_settings() {
+    use pdfcraft_ui_egui::portable::{APP_DIR, OFFICIAL_APP_DIR};
+    if pdfcraft_ui_egui::portable::data_dir().is_some() {
+        return;
+    }
+    let mut copies = vec![(eframe::storage_dir(OFFICIAL_APP_DIR), eframe::storage_dir(APP_DIR))];
+    if cfg!(windows) {
+        let local = std::env::var_os("LOCALAPPDATA").filter(|v| !v.is_empty()).map(std::path::PathBuf::from);
+        for sub in ["Dictionary", "Digital IDs"] {
+            copies.push((local.as_ref().map(|d| d.join(OFFICIAL_APP_DIR).join(sub)), local.as_ref().map(|d| d.join(APP_DIR).join(sub))));
+        }
+    }
+    for (old, new) in copies {
+        let (Some(old), Some(new)) = (old, new) else { continue };
+        match settings::copy_once(&old, &new, &["logs"]) {
+            Ok(true) => log::info!("copied {} to {}", old.display(), new.display()),
+            Ok(false) => {}
+            Err(e) => log::warn!("copying {} to {}: {e}", old.display(), new.display()),
         }
     }
 }
@@ -240,12 +267,14 @@ fn main() -> eframe::Result {
     // GNOME on Wayland leaves the window frame to the app (src/decorations.rs).
     let window_controls = if cfg!(any(target_os = "macos", target_os = "windows")) { None } else { decorations::app_drawn() };
     migrate_legacy_folders();
+    copy_official_settings();
     // The log file stays in the data folder; opened after the arguments (so `--version` leaves
     // no file behind) and after the PrintCraft migration (which a fresh folder would block).
     // Records logged until now are written to it first.
-    if let (Some(logger), Some(dir)) =
-        (logger, pdfcraft_ui_egui::portable::data_dir().map(std::path::Path::to_path_buf).or_else(|| eframe::storage_dir("PdfCraft")))
-    {
+    if let (Some(logger), Some(dir)) = (
+        logger,
+        pdfcraft_ui_egui::portable::data_dir().map(std::path::Path::to_path_buf).or_else(|| eframe::storage_dir(pdfcraft_ui_egui::portable::APP_DIR)),
+    ) {
         match logger.attach_dir(&dir.join("logs")) {
             Ok(path) => log::info!("PdfCraft {}, log file {}", pdfcraft_engine::build_info::version(), path.display()),
             // Standard error only by now (`attach_dir` gave up on the file); unlike `eprintln!`, never panics.
@@ -274,7 +303,7 @@ fn main() -> eframe::Result {
     let started = Rc::new(Cell::new(false));
     let first = if choice == RendererChoice::Gl { eframe::Renderer::Glow } else { eframe::Renderer::Wgpu };
     let result = eframe::run_native(
-        "PdfCraft",
+        pdfcraft_ui_egui::portable::APP_DIR,
         native_options(launch.integrated, launch.window_controls.is_some(), first),
         app_creator(
             launch.clone(),
@@ -292,7 +321,7 @@ fn main() -> eframe::Result {
             // usually still works there, so that's better than quitting.
             log::error!("the GPU renderer (wgpu) didn't start: {e}. Starting with OpenGL instead; set PDFCRAFT_RENDERER=gl to skip wgpu.");
             eframe::run_native(
-                "PdfCraft",
+                pdfcraft_ui_egui::portable::APP_DIR,
                 native_options(launch.integrated, launch.window_controls.is_some(), eframe::Renderer::Glow),
                 app_creator(
                     launch,

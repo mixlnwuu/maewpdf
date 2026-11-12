@@ -33,11 +33,11 @@ fn the_exe_has_version_info_with_the_package_version() {
     let start = find(&exe, &utf16("VS_VERSION_INFO")).expect("no version resource");
     let resource = &exe[start..];
     for (key, value) in [
-        ("ProductName", "PdfCraft"),
-        ("FileDescription", "PdfCraft command-line tool"),
+        ("ProductName", "MaewPDF"),
+        ("FileDescription", "MaewPDF command-line tool"),
         ("LegalCopyright", "Copyright (c) the PdfCraft contributors. MIT OR Apache-2.0."),
-        ("OriginalFilename", "pdfcraft-cli.exe"),
-        ("InternalName", "pdfcraft-cli"),
+        ("OriginalFilename", "maewpdf-cli.exe"),
+        ("InternalName", "maewpdf-cli"),
         ("FileVersion", env!("CARGO_PKG_VERSION")),
         ("ProductVersion", env!("CARGO_PKG_VERSION")),
     ] {

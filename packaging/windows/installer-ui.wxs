@@ -19,7 +19,7 @@
           <Publish Event="SpawnDialog" Value="BrowseFolder" />
         </Control>
         <Control Id="DesktopShortcut" Type="CheckBox" X="20" Y="126" Width="330" Height="17" Property="INSTALLDESKTOPSHORTCUT" CheckBoxValue="1" Text="สร้างทางลัดบนเดสก์ท็อป (&amp;D)" />
-        <Control Id="PdfContextMenu" Type="CheckBox" X="20" Y="144" Width="330" Height="17" Property="INSTALLPDFCONTEXTMENU" CheckBoxValue="1" Text="เพิ่ม &quot;แก้ไข&quot; และ &quot;รวมไฟล์&quot; ของ PdfCraft ในเมนูคลิกขวาของไฟล์ PDF (&amp;E)" />
+        <Control Id="PdfContextMenu" Type="CheckBox" X="20" Y="144" Width="330" Height="17" Property="INSTALLPDFCONTEXTMENU" CheckBoxValue="1" Text="เพิ่ม &quot;แก้ไข&quot; และ &quot;รวมไฟล์&quot; ของ MaewPDF ในเมนูคลิกขวาของไฟล์ PDF (&amp;E)" />
         <Control Id="Install" Type="PushButton" X="195" Y="175" Width="75" Height="23" Default="yes" DefaultCondition="ALLUSERS = 1" ElevationShield="yes" HideCondition="ALLUSERS &lt;&gt; 1" ShowCondition="ALLUSERS = 1" Text="ติดตั้ง (&amp;I)">
           <Publish Event="SetTargetPath" Value="INSTALLFOLDER" Order="1" />
           <Publish Event="EndDialog" Value="Return" Order="2" />

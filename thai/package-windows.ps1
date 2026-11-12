@@ -1,6 +1,6 @@
 # Builds PdfCraft Thai for Windows x64 and packages it, as the official release does, into
-#   dist\release\pdfcraft-<version>-windows-x64.msi            per-machine installer
-#   dist\release\pdfcraft-<version>-windows-x64-portable.zip   portable (settings beside the exe)
+#   dist\release\maewpdf-<version>-windows-x64.msi            per-machine installer
+#   dist\release\maewpdf-<version>-windows-x64-portable.zip   portable (settings beside the exe)
 # both with the OCR models. <version> is the edition's, e.g. 0.10.1-th.1, from thai\VERSION
 # (the MSI's numeric version drops the suffix).
 #
