@@ -13,7 +13,7 @@ const BIN: &str = env!("CARGO_BIN_EXE_pdfcraft-cli");
 
 /// `in/a.pdf` and `outside/secret.pdf`, blank one-page PDFs made by the binary itself.
 fn folders(tag: &str) -> PathBuf {
-    let base = std::env::temp_dir().join(format!("pdfcraft-cli-roots-{tag}-{}", std::process::id()));
+    let base = std::env::temp_dir().join(format!("maewpdf-cli-roots-{tag}-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&base);
     for d in ["in", "out", "outside"] {
         std::fs::create_dir_all(base.join(d)).unwrap();

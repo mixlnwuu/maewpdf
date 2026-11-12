@@ -72,7 +72,7 @@ startxref
 
 /// A fresh directory holding `five.pdf` (5 pages).
 fn workdir(test: &str) -> PathBuf {
-    let d = std::env::temp_dir().join(format!("pdfcraft-cli-extract-{test}-{}", std::process::id()));
+    let d = std::env::temp_dir().join(format!("maewpdf-cli-extract-{test}-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&d);
     std::fs::create_dir_all(&d).unwrap();
     std::fs::write(d.join("five.pdf"), fixture(5)).unwrap();

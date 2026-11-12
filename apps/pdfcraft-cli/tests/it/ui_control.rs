@@ -29,7 +29,7 @@ impl Drop for Scratch {
 }
 
 fn scratch(test: &str) -> Scratch {
-    let dir = std::env::temp_dir().join(format!("pdfcraft-cli-ui-{test}-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("maewpdf-cli-ui-{test}-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).unwrap();
     Scratch(dir)

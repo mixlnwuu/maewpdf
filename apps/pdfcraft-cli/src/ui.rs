@@ -142,7 +142,7 @@ mod tests {
     #[cfg(windows)]
     #[test]
     fn on_windows_a_control_file_other_users_can_read_is_refused() {
-        let dir = std::env::temp_dir().join(format!("pdfcraft-cli-control-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("maewpdf-cli-control-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let users = std::process::Command::new("icacls").arg(&dir).arg("/grant").arg("*S-1-5-32-545:(OI)(CI)R").output().unwrap();

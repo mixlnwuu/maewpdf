@@ -64,10 +64,10 @@ fn compact_flag_shortens_the_tool_list() {
 
 #[test]
 fn compact_flag_keeps_the_root() {
-    let root = std::env::temp_dir().join(format!("pdfcraft-cli-compact-root-{}", std::process::id()));
+    let root = std::env::temp_dir().join(format!("maewpdf-cli-compact-root-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&root);
     std::fs::create_dir_all(&root).unwrap();
-    let outside = std::env::temp_dir().join(format!("pdfcraft-cli-compact-outside-{}.pdf", std::process::id()));
+    let outside = std::env::temp_dir().join(format!("maewpdf-cli-compact-outside-{}.pdf", std::process::id()));
     let outside = outside.to_string_lossy().into_owned();
     let root_arg = root.to_string_lossy().into_owned();
     let open_outside =

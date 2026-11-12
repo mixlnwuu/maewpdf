@@ -7,7 +7,7 @@ const PNG: &[u8] = b"\x89PNG\r\n\x1a\n";
 
 /// `root/` next to `outside/` (holding `existing.txt`) in a fresh temporary directory.
 fn sandbox(test: &str) -> PathBuf {
-    let base = std::env::temp_dir().join(format!("pdfcraft-cli-{test}-{}", std::process::id()));
+    let base = std::env::temp_dir().join(format!("maewpdf-cli-{test}-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&base);
     std::fs::create_dir_all(base.join("root")).unwrap();
     std::fs::create_dir_all(base.join("outside")).unwrap();

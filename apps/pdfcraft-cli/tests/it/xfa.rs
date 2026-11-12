@@ -45,7 +45,7 @@ fn fixture_with(test: &str, event: &str) -> PathBuf {
         bytes.extend_from_slice(format!("{offset:010} 00000 n \n").as_bytes());
     }
     bytes.extend_from_slice(format!("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n").as_bytes());
-    let dir = std::env::temp_dir().join(format!("pdfcraft-cli-xfa-{test}-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("maewpdf-cli-xfa-{test}-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let path = dir.join("form.pdf");
     std::fs::write(&path, bytes).unwrap();

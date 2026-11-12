@@ -59,7 +59,7 @@ fn protected_with(algorithm: Algorithm, content: &str) -> Vec<u8> {
 }
 
 fn tmp(name: &str) -> std::path::PathBuf {
-    let d = std::env::temp_dir().join(format!("pdfcraft-cli-owner-{}", std::process::id()));
+    let d = std::env::temp_dir().join(format!("maewpdf-cli-owner-{}", std::process::id()));
     std::fs::create_dir_all(&d).unwrap();
     d.join(name)
 }

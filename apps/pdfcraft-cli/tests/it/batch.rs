@@ -5,7 +5,7 @@ const BIN: &str = env!("CARGO_BIN_EXE_pdfcraft-cli");
 
 #[test]
 fn cli_batch_reports_partial_failure_and_continues_into_subfolders() {
-    let dir = std::env::temp_dir().join(format!("pdfcraft-cli-batch-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("maewpdf-cli-batch-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(dir.join("input/sub")).unwrap();
     std::fs::write(dir.join("input/0.pdf"), b"broken").unwrap();

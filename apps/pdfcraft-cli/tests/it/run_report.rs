@@ -3,7 +3,7 @@
 use std::process::{Command, Output};
 
 fn run_script(test: &str, steps: &serde_json::Value, extra: &[&str]) -> Output {
-    let dir = std::env::temp_dir().join(format!("pdfcraft-cli-{test}-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("maewpdf-cli-{test}-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).unwrap();
     let script = dir.join("steps.json");

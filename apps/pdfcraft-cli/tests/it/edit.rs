@@ -30,7 +30,7 @@ fn fixture() -> Vec<u8> {
 }
 
 fn tmp(test: &str, name: &str) -> PathBuf {
-    let d = std::env::temp_dir().join(format!("pdfcraft-cli-edit-{test}-{}", std::process::id()));
+    let d = std::env::temp_dir().join(format!("maewpdf-cli-edit-{test}-{}", std::process::id()));
     std::fs::create_dir_all(&d).unwrap();
     d.join(name)
 }
@@ -116,7 +116,7 @@ mod one_based_arguments {
             static NEXT: AtomicU64 = AtomicU64::new(0);
             for _ in 0..128 {
                 let path =
-                    std::env::temp_dir().join(format!("pdfcraft-cli-one-based-{}-{}", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed)));
+                    std::env::temp_dir().join(format!("maewpdf-cli-one-based-{}-{}", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed)));
                 match std::fs::create_dir(&path) {
                     Ok(()) => return Self(path),
                     Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
@@ -147,7 +147,7 @@ mod one_based_arguments {
                 ] {
                     let out = Command::new(BIN).current_dir(&dir.0).args([command, input, "--out", destination, option, value]).output().unwrap();
                     assert_eq!(out.status.code(), Some(1), "{command} {input} {option} {value}");
-                    assert_eq!(out.stderr, format!("pdfcraft-cli: {diagnostic}\n").as_bytes());
+                    assert_eq!(out.stderr, format!("maewpdf-cli: {diagnostic}\n").as_bytes());
                     assert!(out.stdout.is_empty());
                     assert_eq!(std::fs::read(dir.0.join("input.pdf")).unwrap(), source);
                     assert_eq!(std::fs::read(dir.0.join("output.pam")).unwrap(), b"keep destination");
@@ -210,7 +210,7 @@ fn a_value_an_option_cannot_hold_is_named_before_the_file_is_opened() {
     ] {
         let out = Command::new(BIN).current_dir(&dir).args(["edit", "missing.pdf", "--out", "out.pdf", option, value]).output().unwrap();
         assert_eq!(out.status.code(), Some(1), "{option} {value}");
-        assert_eq!(out.stderr, format!("pdfcraft-cli: {diagnostic}\n").as_bytes(), "{option} {value}");
+        assert_eq!(out.stderr, format!("maewpdf-cli: {diagnostic}\n").as_bytes(), "{option} {value}");
         assert!(out.stdout.is_empty(), "{option} {value}");
         assert!(!dir.join("out.pdf").exists(), "{option} {value}: no output may be written");
     }
@@ -235,7 +235,7 @@ fn a_destination_past_the_end_fails_and_writes_nothing() {
     ] {
         let out = Command::new(BIN).args(["edit", input.to_str().unwrap(), "--out", output.to_str().unwrap(), option, value]).output().unwrap();
         assert_eq!(out.status.code(), Some(1), "{option} {value}");
-        assert_eq!(String::from_utf8_lossy(&out.stderr), format!("pdfcraft-cli: {diagnostic}\n"), "{option} {value}");
+        assert_eq!(String::from_utf8_lossy(&out.stderr), format!("maewpdf-cli: {diagnostic}\n"), "{option} {value}");
         assert!(!output.exists(), "{option} {value}: no output may be written");
     }
 }
@@ -358,7 +358,7 @@ fn a_page_tree_is_not_rebuilt_when_the_reader_shows_other_pages() {
     let output = tmp("scan-disagrees", "out.pdf");
     let out = Command::new(BIN).args(["edit", input.to_str().unwrap(), "--out", output.to_str().unwrap(), "--delete", "2"]).output().unwrap();
     assert_eq!(out.status.code(), Some(1));
-    assert_eq!(String::from_utf8_lossy(&out.stderr), "pdfcraft-cli: the document's page tree lists no pages: the file is damaged\n");
+    assert_eq!(String::from_utf8_lossy(&out.stderr), "maewpdf-cli: the document's page tree lists no pages: the file is damaged\n");
     assert!(!output.exists(), "no page may be deleted");
 }
 
