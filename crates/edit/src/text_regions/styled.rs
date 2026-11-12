@@ -460,7 +460,15 @@ fn calibration_factors(
             // widths of a font PdfCraft embedded may not be read back): such a line keeps its own
             // widths rather than being stretched to the bound.
             let ratio = (source.rect[2] - source.rect[0]) / nominal;
-            let factor = if nominal > 0.0 && !changed_face && (0.5..=2.0).contains(&ratio) { ratio } else { 1.0 };
+            // A run that is mostly spaces (" , " left by an edit of the words around it) is
+            // measured mostly at the spaces' widths, which a subset rarely gives right: stretched
+            // to its drawn width, it was drawn wider still, and every edit of the paragraph widened
+            // it again by the same ratio (×1.5 each time). Such a run keeps its own widths (Thai
+            // edition).
+            let chars = source.text.chars().count();
+            let guessed_spaces = metrics.encode(" ").is_none() && source.text.contains(' ')
+                || source.text.chars().filter(|c| *c == ' ').count().saturating_mul(2) >= chars;
+            let factor = if nominal > 0.0 && !changed_face && !guessed_spaces && (0.5..=2.0).contains(&ratio) { ratio } else { 1.0 };
             calibration.insert(index, factor);
         }
     }
@@ -1580,4 +1588,37 @@ pub(crate) fn rewrite_styled_block(
     })?;
     crate::draw_on_top(doc, &p, o.ctm, &on_top)?;
     Ok(LineEdit { substituted })
+}
+
+#[cfg(test)]
+mod calibration_tests {
+    use super::*;
+
+    /// The calibration of each line of a page drawn with `content` (its fonts' own widths).
+    fn calibrations(content: &str) -> Vec<(String, f64)> {
+        let doc = crate::tests::text_page(content);
+        let lines = crate::text::text_lines(&doc, 0).unwrap();
+        let page = pdfcraft_model::pages(&doc).remove(0);
+        let resources = page.dict.get(b"Resources").and_then(|r| doc.resolve(r).as_dict().cloned()).unwrap_or_default();
+        let fonts = resources.get(b"Font").and_then(|f| doc.resolve(f).as_dict().cloned()).unwrap_or_default();
+        let metrics: std::collections::BTreeMap<String, Metrics> = fonts
+            .iter()
+            .filter_map(|(name, f)| doc.dict(f).map(|d| (String::from_utf8_lossy(name).into_owned(), Metrics::from_dict(&doc, &d))))
+            .collect();
+        let factors = calibration_factors(&lines, &metrics, &BlockStyle::default(), &HashMap::new(), |_, m| source_space(&doc, &fonts, m));
+        lines.iter().enumerate().map(|(i, l)| (l.text.clone(), factors.get(&i).copied().unwrap_or(1.0))).collect()
+    }
+
+    /// Thai edition: a run that is mostly spaces (" , " left by an edit of the words around it) is
+    /// not stretched to its drawn width: its spaces are measured at a guess, and stretched by the
+    /// difference, it was drawn wider on every edit (×1.5 each time). A word stretched by its `TJ`
+    /// gaps still is.
+    #[test]
+    fn a_run_of_spaces_is_not_stretched_to_its_drawn_width() {
+        let spaces = calibrations("BT /F1 12 Tf 72 700 Td [( ) -209 (,) -208 ( )] TJ ET");
+        assert_eq!(spaces.len(), 1, "{spaces:?}");
+        assert!((spaces[0].1 - 1.0).abs() < 1e-9, "{spaces:?}");
+        let word = calibrations("BT /F1 12 Tf 72 700 Td [(Wo) -100 (rd)] TJ ET");
+        assert!(word[0].1 > 1.01, "a justified word keeps its stretch: {word:?}");
+    }
 }
