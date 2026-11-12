@@ -16459,3 +16459,89 @@ fn a_thai_row_of_two_runs_grows_to_the_right_when_typed_into() {
     assert_eq!(block.rows.len(), 1, "still one row, grown to the right: {block:?}");
     assert_eq!(block.text, typed);
 }
+
+/// Thai edition: a paragraph of two colours set in a family's own face (drawn as generated glyphs,
+/// as an installed Angsana New Italic is), then made bold in its last word, keeps the other words
+/// in that face. They are drawn from it again: their generated fonts hold only the letters they
+/// had, and the rest fell to a fallback face ("ell Latitude" came out in another font).
+#[test]
+fn bold_for_one_word_keeps_the_others_in_their_own_face() {
+    // An installed family with an italic and a bold italic face, as Angsana New on Windows.
+    let Some(family) = ["Angsana New", "Arial", "Times New Roman", "DejaVu Sans"]
+        .iter()
+        .find_map(|name| pdfcraft_fonts::installed_families().iter().position(|f| f.name == *name))
+        .and_then(|i| u16::try_from(i).ok())
+        .map(added::Family::Installed)
+        .filter(|f| f.craft(false, true).is_some() && f.craft(true, true).is_some())
+    else {
+        eprintln!("skipped: no installed family with italic faces");
+        return;
+    };
+    let text = "Dell Latitude 5440";
+    // A TrueType subset of the family embedded as Word writes one (the program inside).
+    let mut doc = embedded_program_page(&format!("BT /F1 12 Tf 72 700 Td ({text}) Tj ET"), "CAAIXJ+AngsanaNew");
+    let red = [0.9, 0.1, 0.1];
+    let coloured = text::BlockStyle {
+        ranges: vec![text::RangeStyle {
+            range: 0..4,
+            family: None,
+            resource: None,
+            size: None,
+            color: Some(red),
+            underline: None,
+            char_spacing: None,
+            scale: None,
+        }],
+        ..Default::default()
+    };
+    text::rewrite_block(&mut doc, 0, 0, Some(text), &coloured).unwrap();
+    let mut doc = reopen(&doc);
+    // Italic for all of it in the family's own face, each part keeping its colour.
+    let face = text::BlockStyle {
+        family: Some((family, false, true)),
+        ranges: vec![text::RangeStyle {
+            range: 0..4,
+            family: None,
+            resource: None,
+            size: None,
+            color: Some(red),
+            underline: None,
+            char_spacing: None,
+            scale: None,
+        }],
+        ..Default::default()
+    };
+    text::rewrite_block(&mut doc, 0, 0, None, &face).unwrap();
+    let mut doc = reopen(&doc);
+    let width = |doc: &Document, word: &str| {
+        text::text_lines(doc, 0).unwrap().iter().find(|l| l.text.contains(word)).map(|l| l.rect[2] - l.rect[0]).unwrap_or_default()
+    };
+    let before = width(&doc, "Dell");
+    let block = text::text_blocks(&doc, 0).unwrap().remove(0);
+    let bold = text::BlockStyle {
+        ranges: vec![text::RangeStyle {
+            range: 14..18,
+            family: Some((family, true, true)),
+            resource: None,
+            size: None,
+            color: None,
+            underline: None,
+            char_spacing: None,
+            scale: None,
+        }],
+        ..Default::default()
+    };
+    text::rewrite_block(&mut doc, 0, 0, Some(&block.editor_text), &bold).unwrap();
+    let doc = reopen(&doc);
+    let lines = text::text_lines(&doc, 0).unwrap();
+    assert_eq!(lines.iter().map(|l| l.text.as_str()).collect::<String>().trim(), text, "{lines:?}");
+    assert!(
+        lines.iter().filter(|l| !l.text.trim().is_empty()).all(|l| !l.base_font.contains("Gothic") && !l.base_font.contains("Inter")),
+        "every word in the family's face: {:?}",
+        lines.iter().map(|l| (&l.text, &l.base_font)).collect::<Vec<_>>()
+    );
+    let dell = lines.iter().find(|l| l.text.contains("Dell")).unwrap();
+    assert_eq!(dell.color, red, "Dell keeps its colour");
+    let after = width(&doc, "Dell");
+    assert!((before - after).abs() < 0.5, "Dell keeps its face and width: {before} -> {after}");
+}

@@ -658,6 +658,18 @@ fn wrap_styled_rows(
     Ok((rows, row_ranges, row_lines, row_soft, row_gap))
 }
 
+/// The installed or craft-fonts face a part an earlier edit drew as generated glyphs comes from
+/// (Thai edition: Angsana New Italic, from the machine's Angsana New): it is drawn from that face
+/// again. Its generated font holds only the letters it had, and the rest fell to a fallback face:
+/// bold on "5440" turned "ell Latitude" into another font.
+fn generated_own_face(line: &TextLine) -> Option<(crate::added::Family, bool, bool)> {
+    if !line.font.starts_with("PC") {
+        return None;
+    }
+    let family = crate::added::Family::like_font(&line.base_font)?;
+    family.craft(line.bold, line.italic).map(|_| (family, line.bold, line.italic))
+}
+
 fn apply_range_styles<'a>(
     first: &TextLine,
     lines: &[TextLine],
@@ -688,6 +700,14 @@ fn apply_range_styles<'a>(
             let (Some(start), Some(end)) = (bounds.first().copied(), bounds.get(1).copied()) else { continue };
             let selected = ranges.iter().find(|range| range.range.contains(&start)).copied();
             let mut index = source;
+            if selected.is_none()
+                && style.family.is_none()
+                && style.bold.is_none()
+                && let Some(line) = lines.get(source)
+                && let Some(face) = generated_own_face(line)
+            {
+                own_faces.insert(source, face);
+            }
             if selected.is_some() || style.family.is_some() || style.bold.is_some() {
                 let default_range = RangeStyle {
                     range: start..end,
@@ -713,6 +733,10 @@ fn apply_range_styles<'a>(
                     if family.craft(bold, italic).is_some() {
                         own_face = Some((family, bold, italic));
                     }
+                } else if range.resource.is_none()
+                    && let Some(face) = generated_own_face(&line)
+                {
+                    own_face = Some(face);
                 }
                 if let Some(resource) = &range.resource {
                     line.font = resource.clone();
