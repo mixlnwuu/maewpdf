@@ -32,7 +32,7 @@ fn no_link_leads_to_the_official_community() {
 
 /// Where this unofficial edition's own questions go (its repository), shown in place of the
 /// ArtCraft community card and marks, which docs/brand/LICENSE-brand.txt keeps off modified builds.
-const THAI_EDITION_SITE: &str = "https://mixlnwuu.github.io/pdfcraft/";
+const THAI_EDITION_SITE: &str = "https://mixlnwuu.github.io/maewpdf/";
 
 #[test]
 fn home_screen_names_the_thai_edition_and_its_repository() {
@@ -40,7 +40,7 @@ fn home_screen_names_the_thai_edition_and_its_repository() {
     assert!(h.query_by_label("Join the ArtCraft community").is_none(), "no ArtCraft community card");
     assert!(h.query_all_by_label("ArtCraft").count() == 0, "no ArtCraft mark");
     assert!(h.query_by_label("Join our Discord").is_none(), "no community links on the edition's card");
-    assert!(h.query_by_label_contains("PdfCraft ภาษาไทย (ฉบับไม่เป็นทางการ)").is_some(), "the edition is named");
+    assert!(h.query_by_label_contains("MaewPDF · โปรแกรมแก้ไข PDF ภาษาไทย").is_some(), "the edition is named");
     h.get_by_label(THAI_EDITION_SITE);
 }
 
@@ -53,7 +53,7 @@ fn about_dialog_names_the_thai_edition_without_the_brand() {
         app.dialog = Some(Dialog::About);
     });
     assert_eq!(h.query_all_by_label("ArtCraft").count(), 0, "no ArtCraft mark or wordmark");
-    assert!(h.query_by_label_contains("PdfCraft ภาษาไทย (ฉบับไม่เป็นทางการ)").is_some(), "the edition is named");
+    assert!(h.query_by_label_contains("MaewPDF · โปรแกรมแก้ไข PDF ภาษาไทย").is_some(), "the edition is named");
     h.get_by_label(THAI_EDITION_SITE);
 }
 

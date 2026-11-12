@@ -151,7 +151,7 @@
 	Accessibility	การช่วยการเข้าถึง
 	Help…	วิธีใช้…
 	Check for updates…	ตรวจหาการอัปเดต…
-	About PdfCraft	เกี่ยวกับ PdfCraft
+	About PdfCraft	เกี่ยวกับ MaewPDF
 	Automatically	อัตโนมัติ
 	Never	ไม่เลย
 	Always	เสมอ
@@ -564,7 +564,7 @@
 	Files are combined from top to bottom. Leave Pages empty to take every page.	ไฟล์จะถูกรวมจากบนลงล่าง เว้นช่องหน้าว่างไว้เพื่อใช้ทุกหน้า
 	Files are combined in the order shown. Drag them to change it.	ไฟล์จะถูกรวมตามลำดับที่แสดง ลากเพื่อเปลี่ยนลำดับ
 	Files for {name}	ไฟล์สำหรับ {name}
-	Files you open in PdfCraft appear here. Drop a PDF anywhere to open it.	ไฟล์ที่คุณเปิดใน PdfCraft จะแสดงที่นี่ วาง PDF ที่ใดก็ได้เพื่อเปิด
+	Files you open in PdfCraft appear here. Drop a PDF anywhere to open it.	ไฟล์ที่คุณเปิดใน MaewPDF จะแสดงที่นี่ วาง PDF ที่ใดก็ได้เพื่อเปิด
 	Fill & Sign dates	วันที่ในกรอกและเซ็น
 	Fill & Sign signature	ลายเซ็นในกรอกและเซ็น
 	Fill Color:	สีเติม:
@@ -872,10 +872,10 @@
 	Pattern	รูปแบบ
 	Patterns	ลวดลาย
 	Patterns (graphics objects)	ลวดลาย (ออบเจ็กต์กราฟิก)
-	PdfCraft didn't shut down normally. These documents had changes that were autosaved:	PdfCraft ปิดตัวลงอย่างไม่ปกติ เอกสารเหล่านี้มีการเปลี่ยนแปลงที่ถูกบันทึกอัตโนมัติไว้:
-	PdfCraft works offline. No telemetry, no account, and no cloud processing unless you add a provider.	PdfCraft ทำงานแบบออฟไลน์ ไม่มีการเก็บข้อมูลการใช้งาน ไม่ต้องมีบัญชี และไม่ประมวลผลบนคลาวด์ เว้นแต่คุณจะเพิ่มผู้ให้บริการเอง
-	PdfCraft {c} is up to date.	PdfCraft {c} เป็นรุ่นล่าสุดแล้ว
-	PdfCraft {v} is available.	มี PdfCraft {v} ให้ใช้งานแล้ว
+	PdfCraft didn't shut down normally. These documents had changes that were autosaved:	MaewPDF ปิดตัวลงอย่างไม่ปกติ เอกสารเหล่านี้มีการเปลี่ยนแปลงที่ถูกบันทึกอัตโนมัติไว้:
+	PdfCraft works offline. No telemetry, no account, and no cloud processing unless you add a provider.	MaewPDF ทำงานแบบออฟไลน์ ไม่มีการเก็บข้อมูลการใช้งาน ไม่ต้องมีบัญชี และไม่ประมวลผลบนคลาวด์ เว้นแต่คุณจะเพิ่มผู้ให้บริการเอง
+	PdfCraft {c} is up to date.	MaewPDF {c} เป็นรุ่นล่าสุดแล้ว
+	PdfCraft {v} is available.	มี MaewPDF {v} ให้ใช้งานแล้ว
 	Percentage	เปอร์เซ็นต์
 	Permissions password	รหัสผ่านสิทธิ์
 	Permitted actions after certifying	การกระทำที่อนุญาตหลังจากรับรอง
@@ -949,7 +949,7 @@
 	Remove {n} files	เอาออก {n} ไฟล์
 	Remove {n} pages	เอาออก {n} หน้า
 	Reopen Closed Tab	เปิดแท็บที่ปิดไปอีกครั้ง
-	Reopen the files that were open when PdfCraft last closed	เปิดไฟล์ที่เปิดค้างไว้ตอนปิด PdfCraft ครั้งล่าสุดอีกครั้ง
+	Reopen the files that were open when PdfCraft last closed	เปิดไฟล์ที่เปิดค้างไว้ตอนปิด MaewPDF ครั้งล่าสุดอีกครั้ง
 	Repair log	บันทึกการซ่อมแซม
 	Repeat overlay text	ทำซ้ำข้อความซ้อนทับ
 	Replace Image…	แทนที่รูปภาพ…
@@ -1127,7 +1127,7 @@
 	Text alignment:	การจัดแนวข้อความ:
 	Text in images isn't found; recognise text (OCR) first.	ไม่พบข้อความในรูปภาพ โปรดรู้จำข้อความ (OCR) ก่อน
 	Text is compared word by word; the differences are shown on the new file.	ข้อความถูกเปรียบเทียบทีละคำ ความแตกต่างจะแสดงบนไฟล์ใหม่
-	Text recognition isn't installed: its model files are missing. Reinstall PdfCraft, or set PDFCRAFT_MODELS to the folder that holds them.	ยังไม่ได้ติดตั้งการรู้จำข้อความ: ไม่พบไฟล์โมเดล โปรดติดตั้ง PdfCraft ใหม่ หรือตั้ง PDFCRAFT_MODELS ไปยังโฟลเดอร์ที่มีไฟล์เหล่านั้น
+	Text recognition isn't installed: its model files are missing. Reinstall PdfCraft, or set PDFCRAFT_MODELS to the folder that holds them.	ยังไม่ได้ติดตั้งการรู้จำข้อความ: ไม่พบไฟล์โมเดล โปรดติดตั้ง MaewPDF ใหม่ หรือตั้ง PDFCRAFT_MODELS ไปยังโฟลเดอร์ที่มีไฟล์เหล่านั้น
 	Text to find	ข้อความที่จะค้นหา
 	Text to insert	ข้อความที่จะแทรก
 	Text used as a clipping path cannot be moved with this selection.	ข้อความที่ใช้เป็นเส้นตัดภาพไม่สามารถย้ายพร้อมกับส่วนที่เลือกนี้ได้
@@ -1142,9 +1142,9 @@
 	The document's security settings don't allow copying text and images	การตั้งค่าความปลอดภัยของเอกสารไม่อนุญาตให้คัดลอกข้อความและรูปภาพ
 	The document's security settings don't allow this change	การตั้งค่าความปลอดภัยของเอกสารไม่อนุญาตการเปลี่ยนแปลงนี้
 	The existing action will be preserved.	การทำงานที่มีอยู่จะถูกคงไว้
-	The fonts PdfCraft writes with can't draw “{c}” ({code}), so it shows as ? in every PDF viewer. The text is saved.	แบบอักษรที่ PdfCraft ใช้เขียนวาด “{c}” ({code}) ไม่ได้ จึงแสดงเป็น ? ในโปรแกรมอ่าน PDF ทุกตัว ข้อความถูกบันทึกไว้แล้ว
-	The key is in the Windows certificate store, which may ask to allow PdfCraft to use it.	กุญแจอยู่ในที่เก็บใบรับรองของ Windows ซึ่งอาจถามเพื่ออนุญาตให้ PdfCraft ใช้งาน
-	The key is in the macOS Keychain, which may ask to allow PdfCraft to use it.	กุญแจอยู่ใน Keychain ของ macOS ซึ่งอาจถามเพื่ออนุญาตให้ PdfCraft ใช้งาน
+	The fonts PdfCraft writes with can't draw “{c}” ({code}), so it shows as ? in every PDF viewer. The text is saved.	แบบอักษรที่ MaewPDF ใช้เขียนวาด “{c}” ({code}) ไม่ได้ จึงแสดงเป็น ? ในโปรแกรมอ่าน PDF ทุกตัว ข้อความถูกบันทึกไว้แล้ว
+	The key is in the Windows certificate store, which may ask to allow PdfCraft to use it.	กุญแจอยู่ในที่เก็บใบรับรองของ Windows ซึ่งอาจถามเพื่ออนุญาตให้ MaewPDF ใช้งาน
+	The key is in the macOS Keychain, which may ask to allow PdfCraft to use it.	กุญแจอยู่ใน Keychain ของ macOS ซึ่งอาจถามเพื่ออนุญาตให้ MaewPDF ใช้งาน
 	The newest {n} of {total} PDFs	PDF ล่าสุด {n} จาก {total} ไฟล์
 	The password is only used to read the file; it isn't saved.	รหัสผ่านใช้เพื่ออ่านไฟล์เท่านั้น จะไม่ถูกบันทึกไว้
 	The printer driver's own settings for this print: paper tray, paper type, finishing and more.	การตั้งค่าของไดรเวอร์เครื่องพิมพ์สำหรับการพิมพ์ครั้งนี้: ถาดกระดาษ ชนิดกระดาษ การตกแต่งงานพิมพ์ และอื่น ๆ
@@ -1185,7 +1185,7 @@
 	This file was damaged and has been repaired. Saving keeps the repaired version.	ไฟล์นี้เสียหายและได้รับการซ่อมแซมแล้ว การบันทึกจะเก็บรุ่นที่ซ่อมแซมไว้
 	This folder isn't available right now. It may have moved, or its drive or cloud sync is offline.	โฟลเดอร์นี้ใช้งานไม่ได้ในขณะนี้ อาจถูกย้าย หรือไดรฟ์หรือการซิงก์คลาวด์ออฟไลน์อยู่
 	This form's scripts are turned off because one ran too long. Reopen the document to run them again.	สคริปต์ของแบบฟอร์มนี้ถูกปิดเพราะมีสคริปต์ทำงานนานเกินไป เปิดเอกสารใหม่เพื่อรันอีกครั้ง
-	This is a dynamic XFA form, which PdfCraft can't display yet. What you see is the file's placeholder page.	นี่เป็นแบบฟอร์ม XFA แบบไดนามิก ซึ่ง PdfCraft ยังแสดงไม่ได้ สิ่งที่คุณเห็นคือหน้าตัวแทนของไฟล์
+	This is a dynamic XFA form, which PdfCraft can't display yet. What you see is the file's placeholder page.	นี่เป็นแบบฟอร์ม XFA แบบไดนามิก ซึ่ง MaewPDF ยังแสดงไม่ได้ สิ่งที่คุณเห็นคือหน้าตัวแทนของไฟล์
 	This measurement needs at least {n} points.	การวัดนี้ต้องมีอย่างน้อย {n} จุด
 	This page contains objects that cannot be selected together.	หน้านี้มีออบเจ็กต์ที่เลือกพร้อมกันไม่ได้
 	This page couldn't be displayed.\n{e}	แสดงหน้านี้ไม่ได้\n{e}
@@ -1262,7 +1262,7 @@
 	Visible Rectangle	สี่เหลี่ยมที่มองเห็น
 	Visual	ภาพ
 	Warnings	คำเตือน
-	Welcome to PdfCraft	ยินดีต้อนรับสู่ PdfCraft
+	Welcome to PdfCraft	ยินดีต้อนรับสู่ MaewPDF
 	What word or phrase would you like to search for?	คุณต้องการค้นหาคำหรือวลีใด
 	Whole words only	ทั้งคำเท่านั้น
 	Width:	ความกว้าง:
@@ -1505,8 +1505,8 @@
 	Page options	ตัวเลือกหน้า
 	Page transitions	การเปลี่ยนหน้า
 	Paste pages	วางหน้า
-	PdfCraft on GitHub	PdfCraft บน GitHub
-	PdfCraft web page	หน้าเว็บ PdfCraft
+	PdfCraft on GitHub	MaewPDF บน GitHub
+	PdfCraft web page	หน้าเว็บ MaewPDF
 	Perimeter	เส้นรอบรูป
 	Pin folder to Home…	ปักหมุดโฟลเดอร์ไว้ที่หน้าแรก…
 	PostScript / EPS	PostScript / EPS
@@ -1665,7 +1665,7 @@
 	Page {} has additional actions	หน้า {} มีการทำงานเพิ่มเติม
 	Panel layout could not be restored: {error}	กู้คืนเค้าโครงแผงไม่ได้: {error}
 	Panel move was not applied: {error}	ย้ายแผงไม่สำเร็จ: {error}
-	PdfCraft can't check this signature yet: {}.	PdfCraft ยังตรวจสอบลายเซ็นนี้ไม่ได้: {}
+	PdfCraft can't check this signature yet: {}.	MaewPDF ยังตรวจสอบลายเซ็นนี้ไม่ได้: {}
 	Previous (⇧⌘G)	ก่อนหน้า (⇧⌘G)
 	Print (⌘P)	พิมพ์ (⌘P)
 	Producer	โปรแกรมที่ผลิต PDF
@@ -1729,7 +1729,7 @@
 	The signed content is a constructed (segmented) OCTET STRING, as BER allows; it was read anyway.	เนื้อหาที่เซ็นเป็น OCTET STRING แบบแบ่งส่วนตามที่ BER อนุญาต แต่ยังอ่านได้
 	The signer's certificate does not allow digital signatures (its key usage has neither digital signature nor non-repudiation).	ใบรับรองของผู้เซ็นไม่อนุญาตให้ใช้กับลายเซ็นดิจิทัล (key usage ไม่มีทั้ง digital signature และ non-repudiation)
 	The signer's certificate has been revoked ({}).	ใบรับรองของผู้เซ็นถูกเพิกถอนแล้ว ({})
-	The signer's certificate has critical extensions PdfCraft does not recognize ({}).	ใบรับรองของผู้เซ็นมีส่วนขยายสำคัญที่ PdfCraft ไม่รู้จัก ({})
+	The signer's certificate has critical extensions PdfCraft does not recognize ({}).	ใบรับรองของผู้เซ็นมีส่วนขยายสำคัญที่ MaewPDF ไม่รู้จัก ({})
 	The signer's certificate is not in the signature.	ใบรับรองของผู้เซ็นไม่อยู่ในลายเซ็น
 	The signer's certificate is not issued for signing documents (its extended key usage has no document-signing purpose).	ใบรับรองของผู้เซ็นไม่ได้ออกให้สำหรับเซ็นเอกสาร (extended key usage ไม่มีวัตถุประสงค์การเซ็นเอกสาร)
 	The signer's certificate was not valid at the time of signing.	ใบรับรองของผู้เซ็นไม่ถูกต้อง ณ เวลาที่เซ็น
@@ -2173,7 +2173,7 @@ comment menu	Edit	แก้ไข
 	Passed	ผ่าน
 	Password protection will be applied when you save	การป้องกันด้วยรหัสผ่านจะมีผลเมื่อคุณบันทึก
 	Path	เส้นทาง
-	PdfCraft is drawing without a graphics processor, so it may be slow. Updating the graphics driver may help.	PdfCraft กำลังวาดโดยไม่ใช้หน่วยประมวลผลกราฟิก จึงอาจทำงานช้า การอัปเดตไดรเวอร์กราฟิกอาจช่วยได้
+	PdfCraft is drawing without a graphics processor, so it may be slow. Updating the graphics driver may help.	MaewPDF กำลังวาดโดยไม่ใช้หน่วยประมวลผลกราฟิก จึงอาจทำงานช้า การอัปเดตไดรเวอร์กราฟิกอาจช่วยได้
 	People may need more time to respond. Check that nothing has a time limit.	ผู้ใช้อาจต้องการเวลาตอบสนองมากขึ้น ตรวจสอบว่าไม่มีสิ่งใดจำกัดเวลา
 	Phone Number	หมายเลขโทรศัพท์
 	Phone Numbers	หมายเลขโทรศัพท์
@@ -2329,7 +2329,7 @@ comment menu	Edit	แก้ไข
 	The document's security settings don't allow filling in form fields	การตั้งค่าความปลอดภัยของเอกสารไม่อนุญาตให้กรอกช่องแบบฟอร์ม
 	The field properties could not be changed.	เปลี่ยนคุณสมบัติช่องไม่ได้
 	The field properties dialog is no longer open.	กล่องโต้ตอบคุณสมบัติช่องไม่ได้เปิดอยู่แล้ว
-	The form asks to be submitted to {u}; PdfCraft doesn't send form data. Save the document to keep your entries.	แบบฟอร์มขอให้ส่งไปที่ {u} แต่ PdfCraft ไม่ส่งข้อมูลแบบฟอร์ม บันทึกเอกสารเพื่อเก็บสิ่งที่คุณกรอก
+	The form asks to be submitted to {u}; PdfCraft doesn't send form data. Save the document to keep your entries.	แบบฟอร์มขอให้ส่งไปที่ {u} แต่ MaewPDF ไม่ส่งข้อมูลแบบฟอร์ม บันทึกเอกสารเพื่อเก็บสิ่งที่คุณกรอก
 	The form asks viewers to make appearances (NeedAppearances)	แบบฟอร์มขอให้โปรแกรมอ่านสร้างลักษณะที่ปรากฏเอง (NeedAppearances)
 	The linked PDF opened, but its named destination was not applied.	เปิด PDF ที่ลิงก์ไว้แล้ว แต่ไม่ได้ไปยังปลายทางที่มีชื่อ
 	The linked PDF opened, but its page destination was out of range.	เปิด PDF ที่ลิงก์ไว้แล้ว แต่ปลายทางหน้าอยู่นอกช่วง
@@ -2350,7 +2350,7 @@ comment menu	Edit	แก้ไข
 	This document has no form fields.	เอกสารนี้ไม่มีช่องแบบฟอร์ม
 	This document has no layers.	เอกสารนี้ไม่มีเลเยอร์
 	This file is already as small as it can be made ({size}). No copy was saved.	ไฟล์นี้เล็กที่สุดเท่าที่ทำได้แล้ว ({size}) ไม่ได้บันทึกสำเนา
-	This form also contains XFA data, which PdfCraft doesn't read yet. You can fill its fields, but Acrobat may show the XFA values instead.	แบบฟอร์มนี้มีข้อมูล XFA ด้วย ซึ่ง PdfCraft ยังอ่านไม่ได้ คุณกรอกช่องได้ แต่ Acrobat อาจแสดงค่าของ XFA แทน
+	This form also contains XFA data, which PdfCraft doesn't read yet. You can fill its fields, but Acrobat may show the XFA values instead.	แบบฟอร์มนี้มีข้อมูล XFA ด้วย ซึ่ง MaewPDF ยังอ่านไม่ได้ คุณกรอกช่องได้ แต่ Acrobat อาจแสดงค่าของ XFA แทน
 	Thumbnails	ภาพขนาดย่อ
 	Timed responses	การตอบสนองแบบจำกัดเวลา
 	Type Password	พิมพ์รหัสผ่าน
@@ -2403,7 +2403,7 @@ comment menu	Edit	แก้ไข
 	the document is protected by a password	เอกสารถูกป้องกันด้วยรหัสผ่าน
 	the image is empty	รูปภาพว่างเปล่า
 	the password is incorrect	รหัสผ่านไม่ถูกต้อง
-	the text recognition models are not installed (reinstall PdfCraft, or set PDFCRAFT_MODELS to the folder that holds them)	ยังไม่ได้ติดตั้งโมเดลการรู้จำข้อความ (ติดตั้ง PdfCraft ใหม่ หรือตั้ง PDFCRAFT_MODELS ไปยังโฟลเดอร์ที่มีไฟล์เหล่านั้น)
+	the text recognition models are not installed (reinstall PdfCraft, or set PDFCRAFT_MODELS to the folder that holds them)	ยังไม่ได้ติดตั้งโมเดลการรู้จำข้อความ (ติดตั้ง MaewPDF ใหม่ หรือตั้ง PDFCRAFT_MODELS ไปยังโฟลเดอร์ที่มีไฟล์เหล่านั้น)
 	the title must not be empty	ชื่อเรื่องต้องไม่ว่าง
 	there are no pages to print	ไม่มีหน้าให้พิมพ์
 	there are no redaction marks to apply	ไม่มีเครื่องหมายปิดทับให้ใช้
@@ -2416,19 +2416,19 @@ comment menu	Edit	แก้ไข
 	{label} failed: {e}	{label} ล้มเหลว: {e}
 	{name} has no action	{name} ไม่มีการทำงาน
 	{name} is too large for a word list (at most 1 MB).	{name} ใหญ่เกินไปสำหรับรายการคำ (ไม่เกิน 1 MB)
-	{name} submits the form to {url}; PdfCraft doesn't send form data. Save the document to keep your entries.	{name} จะส่งแบบฟอร์มไปที่ {url} แต่ PdfCraft ไม่ส่งข้อมูลแบบฟอร์ม บันทึกเอกสารเพื่อเก็บสิ่งที่คุณกรอก
+	{name} submits the form to {url}; PdfCraft doesn't send form data. Save the document to keep your entries.	{name} จะส่งแบบฟอร์มไปที่ {url} แต่ MaewPDF ไม่ส่งข้อมูลแบบฟอร์ม บันทึกเอกสารเพื่อเก็บสิ่งที่คุณกรอก
 	{name}: choosing images arrives on the web with file pickers for images	{name}: การเลือกรูปภาพบนเว็บจะมาพร้อมกับตัวเลือกไฟล์สำหรับรูปภาพ
 	{name}: the {other} action isn't supported yet	{name}: ยังไม่รองรับการทำงาน {other}
-	{who} in this document tried to open an address PdfCraft won't open: {e}.	{who}ในเอกสารนี้พยายามเปิดที่อยู่ที่ PdfCraft จะไม่เปิด: {e}
-	{who} in this document tried to open an address PdfCraft won't open: {e}. Only web (http, https) and email (mailto) links open from documents.	{who}ในเอกสารนี้พยายามเปิดที่อยู่ที่ PdfCraft จะไม่เปิด: {e} เอกสารเปิดได้เฉพาะลิงก์เว็บ (http, https) และอีเมล (mailto)
+	{who} in this document tried to open an address PdfCraft won't open: {e}.	{who}ในเอกสารนี้พยายามเปิดที่อยู่ที่ MaewPDF จะไม่เปิด: {e}
+	{who} in this document tried to open an address PdfCraft won't open: {e}. Only web (http, https) and email (mailto) links open from documents.	{who}ในเอกสารนี้พยายามเปิดที่อยู่ที่ MaewPDF จะไม่เปิด: {e} เอกสารเปิดได้เฉพาะลิงก์เว็บ (http, https) และอีเมล (mailto)
 animation effects	Off	ปิด
 animation effects	On	เปิด
 	View more	ดูเพิ่มเติม
 	View less	ดูน้อยลง
 	Only continue if you trust this document. An address can carry information from the document, such as what you typed into its form.	ดำเนินการต่อเฉพาะเมื่อคุณเชื่อถือเอกสารนี้ ที่อยู่อาจพาข้อมูลจากเอกสารไปด้วย เช่น สิ่งที่คุณพิมพ์ในแบบฟอร์ม
 	Print single-sided. Keep the sheets in order, cut at the marks, then stack the piles left to right, top to bottom.	พิมพ์ด้านเดียว เรียงแผ่นตามลำดับ ตัดตามเครื่องหมาย แล้วซ้อนกองจากซ้ายไปขวา บนลงล่าง
-	Sign a sheet of white paper and take a photo of it in bright, even light (use the flash). Choose the photo or drop it here: PdfCraft finds the signature and removes the paper.	เซ็นชื่อบนกระดาษขาวแล้วถ่ายรูปในที่สว่างสม่ำเสมอ (ใช้แฟลช) เลือกรูปถ่ายหรือวางที่นี่ PdfCraft จะหาลายเซ็นและเอาพื้นกระดาษออก
-	This field's font can't draw “{c}” ({code}), so PdfCraft shows ? in its place. The value is saved, and other PDF viewers redraw the field from it.	แบบอักษรของช่องนี้วาด “{c}” ({code}) ไม่ได้ PdfCraft จึงแสดง ? แทน ค่าถูกบันทึกไว้ และโปรแกรมอ่าน PDF อื่นจะวาดช่องใหม่จากค่านั้น
+	Sign a sheet of white paper and take a photo of it in bright, even light (use the flash). Choose the photo or drop it here: PdfCraft finds the signature and removes the paper.	เซ็นชื่อบนกระดาษขาวแล้วถ่ายรูปในที่สว่างสม่ำเสมอ (ใช้แฟลช) เลือกรูปถ่ายหรือวางที่นี่ MaewPDF จะหาลายเซ็นและเอาพื้นกระดาษออก
+	This field's font can't draw “{c}” ({code}), so PdfCraft shows ? in its place. The value is saved, and other PDF viewers redraw the field from it.	แบบอักษรของช่องนี้วาด “{c}” ({code}) ไม่ได้ MaewPDF จึงแสดง ? แทน ค่าถูกบันทึกไว้ และโปรแกรมอ่าน PDF อื่นจะวาดช่องใหม่จากค่านั้น
 	{chars} can't be written into the PDF yet: Fill & Sign text is Western European only. Pick a numeric format such as dd.mm.yyyy.	ยังเขียน {chars} ลงใน PDF ไม่ได้: ข้อความของกรอกและเซ็นรองรับเฉพาะอักขระยุโรปตะวันตก ให้เลือกรูปแบบตัวเลข เช่น dd.mm.yyyy
 	January	มกราคม
 	February	กุมภาพันธ์
@@ -2669,7 +2669,7 @@ key	Space	Space
 	Click, then click a text box to give it this format. Double-click to format several boxes; Esc stops.	คลิก แล้วคลิกกล่องข้อความเพื่อให้ได้รูปแบบเดียวกัน ดับเบิลคลิกเพื่อใช้กับหลายกล่อง กด Esc เพื่อหยุด
 	not on this computer	ไม่มีในเครื่อง
 	{n} text boxes	กล่องข้อความ {n} กล่อง
-	{fonts} isn't on this computer, so {used} was used instead. Install {font} and open PdfCraft again for text that matches the original.	ไม่มีฟอนต์ {fonts} ในเครื่อง จึงใช้ {used} แทน ติดตั้งฟอนต์ {font} แล้วเปิด PdfCraft ใหม่ ข้อความจะตรงกับต้นฉบับ
+	{fonts} isn't on this computer, so {used} was used instead. Install {font} and open PdfCraft again for text that matches the original.	ไม่มีฟอนต์ {fonts} ในเครื่อง จึงใช้ {used} แทน ติดตั้งฟอนต์ {font} แล้วเปิด MaewPDF ใหม่ ข้อความจะตรงกับต้นฉบับ
 	Found {n} untagged content problems.	พบปัญหาเนื้อหาที่ไม่มีแท็ก {n} รายการ
 	Full Screen	เต็มหน้าจอ
 	Hide hover previews for highlights without comment text	ซ่อนตัวอย่างเมื่อชี้ของไฮไลต์ที่ไม่มีข้อความความคิดเห็น
@@ -2864,15 +2864,15 @@ theme	Appearance	ลักษณะที่ปรากฏ
 	Unchecked reads	Unchecked reads
 	{field} reads fields named as it runs	{field} reads fields named as it runs
 	Some names are built as it runs	Some names are built as it runs
-	PdfCraft {v} is available with the latest features and bug fixes.	PdfCraft {v} พร้อมให้อัปเดตแล้ว มีฟีเจอร์ใหม่และแก้ปัญหาต่าง ๆ
+	PdfCraft {v} is available with the latest features and bug fixes.	MaewPDF {v} พร้อมให้อัปเดตแล้ว มีฟีเจอร์ใหม่และแก้ปัญหาต่าง ๆ
 	Update and restart	อัปเดตและเปิดใหม่
 	What's new	มีอะไรใหม่
 	Downloading the update…	กำลังดาวน์โหลดอัปเดต…
-	The update will be installed when PdfCraft closes.	จะติดตั้งอัปเดตเมื่อปิด PdfCraft
+	The update will be installed when PdfCraft closes.	จะติดตั้งอัปเดตเมื่อปิด MaewPDF
 	Couldn't update: {e}	อัปเดตไม่สำเร็จ: {e}
-	Check for updates when PdfCraft starts	ตรวจหาอัปเดตเมื่อเปิด PdfCraft
+	Check for updates when PdfCraft starts	ตรวจหาอัปเดตเมื่อเปิด MaewPDF
 	Thai	ไทย
-	The update to PdfCraft {v} wasn't installed: you still have {c}. It can be downloaded from its release page.	อัปเดตเป็น PdfCraft {v} ไม่สำเร็จ ตอนนี้ยังเป็นรุ่น {c} ดาวน์โหลดได้จากหน้ารุ่นนั้น
+	The update to PdfCraft {v} wasn't installed: you still have {c}. It can be downloaded from its release page.	อัปเดตเป็น MaewPDF {v} ไม่สำเร็จ ตอนนี้ยังเป็นรุ่น {c} ดาวน์โหลดได้จากหน้ารุ่นนั้น
 # Image paste and Home notifications (AI-assisted; not separately native-reviewed)
 	Search…	ค้นหา…
 	Image pasted	วางรูปภาพแล้ว
@@ -2982,8 +2982,8 @@ theme	Appearance	ลักษณะที่ปรากฏ
 	Remove {standard} identification	เอาการระบุมาตรฐาน {standard} ออก
 	Couldn't open {name}: the background worker stopped	เปิด {name} ไม่ได้: งานเบื้องหลังหยุดทำงาน
 	Couldn't open {name}: {reason}	เปิด {name} ไม่ได้: {reason}
-	PdfCraft's checks found no problems for {level}. This is not a validator result.	การตรวจของ PdfCraft ไม่พบปัญหาสำหรับ {level} (นี่ไม่ใช่ผลจากโปรแกรมตรวจรับรองมาตรฐาน)
-	PdfCraft's checks now find no problems for {level}. This is not a validator result. Save to keep the changes.	ตอนนี้การตรวจของ PdfCraft ไม่พบปัญหาสำหรับ {level} แล้ว (นี่ไม่ใช่ผลจากโปรแกรมตรวจรับรองมาตรฐาน) บันทึกเพื่อเก็บการเปลี่ยนแปลงไว้
+	PdfCraft's checks found no problems for {level}. This is not a validator result.	การตรวจของ MaewPDF ไม่พบปัญหาสำหรับ {level} (นี่ไม่ใช่ผลจากโปรแกรมตรวจรับรองมาตรฐาน)
+	PdfCraft's checks now find no problems for {level}. This is not a validator result. Save to keep the changes.	ตอนนี้การตรวจของ MaewPDF ไม่พบปัญหาสำหรับ {level} แล้ว (นี่ไม่ใช่ผลจากโปรแกรมตรวจรับรองมาตรฐาน) บันทึกเพื่อเก็บการเปลี่ยนแปลงไว้
 	Bookmarks nested too deep to list could not be copied, so nothing was cut.	บุ๊กมาร์กที่ซ้อนลึกเกินกว่าจะแสดงรายการได้ คัดลอกไม่ได้ จึงไม่ได้ตัดสิ่งใดออก
 	Bookmarks nested too deep to list were left out of the copy.	บุ๊กมาร์กที่ซ้อนลึกเกินกว่าจะแสดงรายการได้ ไม่ได้ถูกคัดลอกไปด้วย
 	Another file dialog is still open. This one will open when it closes.	หน้าต่างเลือกไฟล์อีกหน้าต่างหนึ่งยังเปิดอยู่ หน้าต่างนี้จะเปิดเมื่อหน้าต่างนั้นปิดลง
@@ -3165,7 +3165,7 @@ theme	Appearance	ลักษณะที่ปรากฏ
 	The document's XMP metadata held the redacted text and was removed.	ข้อมูลเมตา XMP ของเอกสารมีข้อความที่ลบทึบไว้ จึงถูกนำออกแล้ว
 	The trim box is kept where it is, so the printed page cuts the same.	กรอบตัดเจียนอยู่ที่เดิม หน้าที่พิมพ์จึงตัดได้เหมือนเดิม
 	This document's script is asking	สคริปต์ของเอกสารนี้กำลังถาม
-	This request comes from the document, not PdfCraft. Only enter a password if you trust this document.	คำขอนี้มาจากเอกสาร ไม่ใช่จาก PdfCraft ใส่รหัสผ่านเฉพาะเมื่อคุณไว้ใจเอกสารนี้
+	This request comes from the document, not PdfCraft. Only enter a password if you trust this document.	คำขอนี้มาจากเอกสาร ไม่ใช่จาก MaewPDF ใส่รหัสผ่านเฉพาะเมื่อคุณไว้ใจเอกสารนี้
 	This script is too long to edit here ({kib} KiB); its start is shown. It is kept as it is.	สคริปต์นี้ยาวเกินกว่าจะแก้ตรงนี้ ({kib} KiB) จึงแสดงเฉพาะช่วงต้น และเก็บไว้ตามเดิม
 	Trim marks	เครื่องหมายตัดเจียน
 	Widen the page to make room	ขยายหน้าให้มีที่ว่าง

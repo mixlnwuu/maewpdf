@@ -18,7 +18,7 @@ use crate::{PdfCraftApp, theme, widgets};
 
 /// Where every release of the Thai edition is listed (Thai edition: its own repository, not
 /// upstream's, so the check offers the edition's next release).
-pub const RELEASES_PAGE: &str = "https://github.com/mixlnwuu/pdfcraft/releases";
+pub const RELEASES_PAGE: &str = "https://github.com/mixlnwuu/maewpdf/releases";
 
 /// The latest published release.
 #[derive(Clone, Debug, PartialEq, Eq)]

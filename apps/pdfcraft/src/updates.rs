@@ -5,10 +5,10 @@ use std::time::Duration;
 use pdfcraft_ui_egui::updates::{Installer, RELEASES_PAGE, Release};
 
 /// The Thai edition's latest release (Thai edition: its own repository, see [`RELEASES_PAGE`]).
-const LATEST: &str = "https://api.github.com/repos/mixlnwuu/pdfcraft/releases/latest";
+const LATEST: &str = "https://api.github.com/repos/mixlnwuu/maewpdf/releases/latest";
 
 /// Where the edition's release files are: an installer listed anywhere else is not offered.
-const DOWNLOADS: &str = "https://github.com/mixlnwuu/pdfcraft/releases/download/";
+const DOWNLOADS: &str = "https://github.com/mixlnwuu/maewpdf/releases/download/";
 
 /// The largest installer accepted (today's is about 100 MB).
 const MAX_INSTALLER: u64 = 1 << 30;
@@ -91,7 +91,7 @@ fn parse(body: &str) -> Result<Release, String> {
 /// The release's Windows installer: named for `version`, on [`DOWNLOADS`], with GitHub's SHA-256
 /// and a size that makes sense. Anything else is not offered.
 fn installer(v: &serde_json::Value, version: &str) -> Option<Installer> {
-    let name = format!("pdfcraft-{}-windows-x64.msi", version.trim_start_matches(['v', 'V']));
+    let name = format!("maewpdf-{}-windows-x64.msi", version.trim_start_matches(['v', 'V']));
     let asset = v["assets"].as_array()?.iter().find(|a| a["name"].as_str() == Some(name.as_str()))?;
     let url = asset["browser_download_url"].as_str().filter(|u| u.starts_with(DOWNLOADS) && !u.contains(['?', '#']) && !u.contains(".."))?;
     let size = asset["size"].as_u64().filter(|s| (1..=MAX_INSTALLER).contains(s))?;
@@ -117,8 +117,8 @@ pub fn download(installer: &Installer, progress: &(dyn Fn(f32) + Sync), stop: &s
         .new_agent();
     let dir = std::env::temp_dir().join("PdfCraft-update");
     std::fs::create_dir_all(&dir).map_err(|e| format!("couldn't make a folder for the download ({e})"))?;
-    let part = dir.join("pdfcraft-update.part");
-    let msi = dir.join("pdfcraft-update.msi");
+    let part = dir.join("maewpdf-update.part");
+    let msi = dir.join("maewpdf-update.msi");
     let result = (|| {
         let mut response = agent
             .get(&installer.url)
@@ -211,16 +211,16 @@ mod tests {
                 r#"{{"tag_name":"v1.2.3-th.1","html_url":"","assets":[{{"name":"{name}","browser_download_url":"{url}","size":{size},"digest":"{digest}"}}]}}"#
             )
         };
-        let good = "https://github.com/mixlnwuu/pdfcraft/releases/download/v1.2.3-th.1/pdfcraft-1.2.3-th.1-windows-x64.msi";
-        let name = "pdfcraft-1.2.3-th.1-windows-x64.msi";
+        let good = "https://github.com/mixlnwuu/maewpdf/releases/download/v1.2.3-th.1/maewpdf-1.2.3-th.1-windows-x64.msi";
+        let name = "maewpdf-1.2.3-th.1-windows-x64.msi";
         let digest = format!("sha256:{hash}");
         let i = parse(&answer(name, good, 5, &digest)).unwrap().installer.expect("offered");
         assert_eq!((i.url.as_str(), i.size, i.sha256), (good, 5, "a".repeat(64)));
         for (name, url, size, digest) in [
-            ("pdfcraft-1.2.2-windows-x64.msi", good, 5, digest.as_str()),
+            ("maewpdf-1.2.2-windows-x64.msi", good, 5, digest.as_str()),
             (name, "https://example.com/pdfcraft.msi", 5, digest.as_str()),
             (name, "https://github.com/storytold/pdfcraft/releases/download/v1/x.msi", 5, digest.as_str()),
-            (name, "https://github.com/mixlnwuu/pdfcraft/releases/download/../../evil.msi", 5, digest.as_str()),
+            (name, "https://github.com/mixlnwuu/maewpdf/releases/download/../../evil.msi", 5, digest.as_str()),
             (name, good, 0, digest.as_str()),
             (name, good, MAX_INSTALLER + 1, digest.as_str()),
             (name, good, 5, "sha256:short"),
@@ -247,18 +247,18 @@ mod tests {
 
     #[test]
     fn an_install_under_program_files_is_for_everyone() {
-        assert!(per_machine(r"C:\Program Files\PdfCraft\pdfcraft.exe"));
-        assert!(!per_machine(r"C:\Users\a\AppData\Local\Programs\PdfCraft\pdfcraft.exe"));
+        assert!(per_machine(r"C:\Program Files\MaewPDF\maewpdf.exe"));
+        assert!(!per_machine(r"C:\Users\a\AppData\Local\Programs\MaewPDF\maewpdf.exe"));
     }
 
     #[test]
     fn answers_are_read_and_only_our_release_pages_are_offered() {
-        let r = parse(r#"{"tag_name":"v0.2.0","html_url":"https://github.com/mixlnwuu/pdfcraft/releases/tag/v0.2.0"}"#).unwrap();
-        assert_eq!(r, Release { version: "v0.2.0".into(), url: "https://github.com/mixlnwuu/pdfcraft/releases/tag/v0.2.0".into(), installer: None });
+        let r = parse(r#"{"tag_name":"v0.2.0","html_url":"https://github.com/mixlnwuu/maewpdf/releases/tag/v0.2.0"}"#).unwrap();
+        assert_eq!(r, Release { version: "v0.2.0".into(), url: "https://github.com/mixlnwuu/maewpdf/releases/tag/v0.2.0".into(), installer: None });
         // Upstream's release pages too (Thai edition): the check offers only the edition's.
         for elsewhere in [
             "https://example.com/pdfcraft.exe",
-            "https://github.com/mixlnwuu/pdfcraft/releases.evil/x",
+            "https://github.com/mixlnwuu/maewpdf/releases.evil/x",
             "javascript:alert(1)",
             "https://github.com/storytold/pdfcraft/releases/tag/v9.9.9",
         ] {

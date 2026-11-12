@@ -37,9 +37,9 @@ macro_rules! tl_ctx {
 
 /// Shown on the home screen and in About in place of the ArtCraft marks, which modified versions
 /// must not carry (docs/brand/LICENSE-brand.txt).
-pub(crate) const THAI_EDITION_NOTE: &str = "PdfCraft ภาษาไทย (ฉบับไม่เป็นทางการ) · ต่อยอดจาก PdfCraft โดยทีม ArtCraft";
+pub(crate) const THAI_EDITION_NOTE: &str = "MaewPDF · โปรแกรมแก้ไข PDF ภาษาไทย ต่อยอดจาก PdfCraft โดยทีม ArtCraft";
 /// Who develops the Thai edition, under [`THAI_EDITION_NOTE`].
-pub(crate) const THAI_EDITION_AUTHOR: &str = "พัฒนาฉบับภาษาไทยโดย Non.sittith";
+pub(crate) const THAI_EDITION_AUTHOR: &str = "พัฒนาโดย Non.sittith";
 
 /// The Thai edition's small mark beside its credit (home screen and About): a cat in a hoodie,
 /// made by the edition's developer (`thai/brand/`, ATTRIBUTION.toml), `height` points tall.
@@ -63,7 +63,7 @@ pub(crate) fn thai_edition_mark(ui: &mut egui::Ui, height: f32) -> egui::Respons
         _ => egui::vec2(height * 0.75, height),
     };
     match texture {
-        Some(t) => ui.add(egui::Image::new((t.id(), size)).alt_text("PdfCraft ภาษาไทย")),
+        Some(t) => ui.add(egui::Image::new((t.id(), size)).alt_text("MaewPDF")),
         None => ui.allocate_response(size, egui::Sense::hover()),
     }
 }
@@ -97,7 +97,7 @@ mod thai_edition_mark_tests {
     }
 }
 /// The edition's website, shown on the home screen and in About.
-pub(crate) const THAI_EDITION_SITE: &str = "https://mixlnwuu.github.io/pdfcraft/";
+pub(crate) const THAI_EDITION_SITE: &str = "https://mixlnwuu.github.io/maewpdf/";
 
 /// The settings key the Thai edition writes beside the others. The official app, which shares the
 /// settings file, drops it when it saves; its absence tells `restore` who wrote the file last.

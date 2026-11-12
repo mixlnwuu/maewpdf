@@ -1,16 +1,16 @@
-//! Where the Thai edition of PdfCraft lives on the web. One table, so the Help menu, the
+//! Where MaewPDF, the Thai PDF editor based on PdfCraft, lives on the web. One table, so the Help menu, the
 //! About dialog, the home screen, the CLI and the README agree.
 
 use icu_properties::props::Script;
 use std::path::{Path, PathBuf};
 
 /// The app's name in its repository's URL.
-pub const APP: &str = "pdfcraft";
+pub const APP: &str = "maewpdf";
 
 // Thai edition: the edition's own pages. Its brand terms ask a modified version not to use the
 // ArtCraft name or present itself as supported by them, so the community links are gone.
-pub const APP_PAGE: &str = "https://mixlnwuu.github.io/pdfcraft/";
-pub const GITHUB: &str = "https://github.com/mixlnwuu/pdfcraft";
+pub const APP_PAGE: &str = "https://mixlnwuu.github.io/maewpdf/";
+pub const GITHUB: &str = "https://github.com/mixlnwuu/maewpdf";
 
 /// A link and the registry command that opens it.
 #[derive(Clone, Copy, Debug)]
