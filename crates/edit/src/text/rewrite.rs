@@ -314,6 +314,20 @@ fn choose_rewrite_path(
     })
 }
 
+/// How far right of the paragraph's other rows its first row starts, in points (Thai edition): a
+/// first-line indent, kept for the first row alone. Zero for one row, turned text, a paragraph
+/// moved or aligned, or rows that start alike.
+fn first_row_indent(b: &TextBlock, lines: &[TextLine], upright: bool, style: &BlockStyle) -> f64 {
+    if !upright || b.rows.len() < 2 || style.align.is_some() || style.offset.is_some() || style.width.is_some() {
+        return 0.0;
+    }
+    let left = |row: &Vec<usize>| row.iter().filter_map(|&i| lines.get(i)).map(|l| l.rect[0].min(l.rect[2])).fold(f64::INFINITY, f64::min);
+    let Some(first) = b.rows.first().map(left) else { return 0.0 };
+    let rest = b.rows.iter().skip(1).map(left).fold(f64::INFINITY, f64::min);
+    let indent = first - rest;
+    if indent.is_finite() && indent > 1.0 { indent } else { 0.0 }
+}
+
 /// The paragraph's text for writing back: explicit line breaks stay (#1443), and so does each typed
 /// U+0020 space: a run of them is not folded into one (#4199, #3797). Every [`row_break`] is a break
 /// too; other white space is written as one space.
@@ -621,6 +635,9 @@ struct LineWriter<'a> {
     space: f64,
     char_spacing: f64,
     lead: f64,
+    /// How far right of the rows after it the paragraph's first row starts, in text space (Thai
+    /// edition): a first-line indent, which the rows after it don't take.
+    indent: f64,
 }
 
 /// What carries over from one line to the next.
@@ -683,6 +700,10 @@ impl LineWriter<'_> {
         let tw = self.stretch(body, last, line_align == Some(crate::added::Align::Justify));
         let (shown, visible) = self.shown(line, body, tw);
         let dx = if tw > 0.0 { 0.0 } else { self.alignment.offset(visible, line_align) };
+        // The rows after an indented first row start at the paragraph's left edge (Thai edition):
+        // a rewrite gave every row the first row's indent.
+        let dx =
+            if index > 0 && !matches!(line_align, Some(crate::added::Align::Center | crate::added::Align::Right)) { dx - self.indent } else { dx };
         if index > 0 {
             // Inside this text object, so the marker starts and ends here. `/PCHard` is a newline
             // that was already in the text. `/PCSoft` rejoins when the box widens, with `/N` the
@@ -1018,7 +1039,7 @@ pub(crate) fn rewrite_block_from(
     let o = &first.origin;
     let last = members.last().copied().unwrap_or(first);
     let emit = &last.origin;
-    let (font_name, ParaStyle { state: o_state, size, old_size, k }) = paragraph_style(o, style, b.phrase_size())?;
+    let (font_name, ParaStyle { state: mut o_state, size, old_size, k }) = paragraph_style(o, style, b.phrase_size())?;
     let source = source_font(doc, &fonts_res, &font_name, first, &flat, style);
     let reuse = source.reuse;
     // Preserve every drawable source glyph; cache missing-glyph lookups as well.
@@ -1037,7 +1058,11 @@ pub(crate) fn rewrite_block_from(
         })
         .unwrap_or_default();
     let source_chars: HashSet<char> = source_advances.iter().filter_map(|(&ch, width)| width.map(|_| ch)).collect();
-    let partial_reuse = !source_chars.is_empty();
+    // Thai edition: shaped text (Thai) is drawn whole from one face, in clusters. Split between
+    // the source subset and the generated font letter by letter, a cluster of a consonant the
+    // subset lacks and a mark it has could be drawn by neither ("can't be shown").
+    let shaped_text = pdfcraft_fonts::source_shaping::required(&flat) || flat.chars().any(super::fallback::is_thai);
+    let partial_reuse = !source_chars.is_empty() && !shaped_text;
     // The chosen style also determines the real Japanese fallback outlines and advances.
     let (family, bold, italic) = style.family.unwrap_or((source_family(&b.base_font), b.bold, b.italic));
     let bold = style.bold.unwrap_or(bold);
@@ -1077,13 +1102,19 @@ pub(crate) fn rewrite_block_from(
         // A chosen family replaces the text's font; otherwise the fallback may match it.
         let source = if style.family.is_some() { "" } else { b.base_font.as_str() };
         // Text the source font draws stays in it: the Type 3 font holds only what it can't, unless
-        // the family draws all of it.
+        // the family draws all of it or the text isn't split between the two (shaped text).
         let missing: String = flat.chars().filter(|ch| !source_chars.contains(ch)).collect();
-        let glyphs = if own_face || style.family.is_some() || missing.is_empty() { flat.as_str() } else { missing.as_str() };
+        let glyphs = if own_face || style.family.is_some() || !partial_reuse || missing.is_empty() { flat.as_str() } else { missing.as_str() };
         Some(type3_font(doc, &mut fonts_res, glyphs, family, bold, italic, source, max_glyphs)?)
     } else {
         None
     };
+    // Thai edition: text drawn whole from a generated face doesn't take the tightening a word
+    // processor gave its own subset's glyphs (Word's Tc of -0.11 em squeezed the new letters of a
+    // Thai row into one another). Spacing chosen, or spacing that widens, stays.
+    if type3.is_some() && !reuse && !partial_reuse && style.char_spacing.is_none() {
+        o_state.char_spacing = o_state.char_spacing.max(0.0);
+    }
     let source_metrics = source.metrics.as_ref().filter(|_| reuse);
     let advance = Advance {
         partial_advances: &source_advances,
@@ -1148,6 +1179,7 @@ pub(crate) fn rewrite_block_from(
         space: source.space,
         char_spacing: o_state.char_spacing,
         lead,
+        indent: first_row_indent(&b, &lines, upright, style) / k,
     };
     let at = if split { start } else { emit.bt_op };
     // Revealed OCR text that something is painted over goes on top of the page, where it starts

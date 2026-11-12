@@ -16545,3 +16545,79 @@ fn bold_for_one_word_keeps_the_others_in_their_own_face() {
     let after = width(&doc, "Dell");
     assert!((before - after).abs() < 0.5, "Dell keeps its face and width: {before} -> {after}");
 }
+
+/// Thai edition: a word typed into a Word Thai subset that has some of its letters (here the
+/// tone mark, not the consonant under it) is drawn whole from the complete Thai face. Split
+/// letter by letter between the subset and the generated font, the cluster "ล่" could be drawn
+/// by neither, and the edit (and Find & Replace) failed with "can't be shown".
+#[test]
+fn a_thai_word_partly_in_a_word_subset_is_drawn_whole() {
+    if added::Family::Sarabun.craft(false, false).is_none() {
+        return; // built without craft-fonts
+    }
+    // A subset of the consonants but ย and ล, Sara Am and the two tone marks.
+    let unicode: &[u8] = b"4 beginbfrange <00d6> <00f6> <0e01> <00f8> <00f9> <0e23> <00fc> <0103> <0e27> <0108> <0108> <0e33> endbfrange 2 beginbfchar <0160> <0e48> <0161> <0e49> endbfchar";
+    let text = "เขตอำ";
+    let mut doc = text_page(&format!("BT /F1 12 Tf 72 700 Td <{}> Tj ET", legacy_thai_codes(text)));
+    let font = legacy_thai_font(&mut doc, "ABCDEF+WordThaiFace", &legacy_thai_program(), unicode);
+    doc.set(pdfcraft_cos::ObjRef::new(5, 0), Object::Dict(font));
+    let mut doc = reopen(&doc);
+    let typed = "อย\u{0E39}\u{0E48}เขตอำเล\u{0E48}น";
+    text::rewrite_block(&mut doc, 0, 0, Some(typed), &text::BlockStyle::default()).unwrap();
+    let doc = reopen(&doc);
+    assert_eq!(text::text_blocks(&doc, 0).unwrap()[0].text, typed);
+    let lines = text::text_lines(&doc, 0).unwrap();
+    let fonts: std::collections::BTreeSet<&str> = lines.iter().map(|l| l.font.as_str()).collect();
+    assert!(
+        !fonts.contains("F1"),
+        "no letter is drawn from the subset between generated ones: {:?}",
+        lines.iter().map(|l| (&l.text, &l.font)).collect::<Vec<_>>()
+    );
+}
+
+/// Thai edition: a Word Thai paragraph whose first row is indented keeps the rows after it at its
+/// left edge when it is rewritten: they all took the first row's indent.
+#[test]
+fn a_first_line_indent_stays_on_the_first_row() {
+    if added::Family::Sarabun.craft(false, false).is_none() {
+        return; // built without craft-fonts
+    }
+    let row = |words: &str| legacy_thai_codes(&words.repeat(6));
+    let mut doc = text_page(&format!("BT /F1 12 Tf 108 700 Td <{}> Tj -36 -18 Td <{}> Tj 0 -18 Td <{}> Tj ET", row("กขคง"), row("จฉชซฌ"), row("ญฎ")));
+    let font = legacy_thai_font(&mut doc, "ABCDEF+WordThaiFace", &legacy_thai_program(), LEGACY_THAI_UNICODE);
+    doc.set(pdfcraft_cos::ObjRef::new(5, 0), Object::Dict(font));
+    let mut doc = reopen(&doc);
+    let block = text::text_blocks(&doc, 0).unwrap().remove(0);
+    assert_eq!(block.rows.len(), 3, "{block:?}");
+    let draft = block.editor_text.replacen("กขคง", "ดตถท", 1);
+    text::rewrite_block(&mut doc, 0, 0, Some(&draft), &text::BlockStyle::default()).unwrap();
+    let doc = reopen(&doc);
+    let block = text::text_blocks(&doc, 0).unwrap().remove(0);
+    let lines = text::text_lines(&doc, 0).unwrap();
+    let left = |row: &Vec<usize>| row.iter().filter_map(|&i| lines.get(i)).map(|l| l.rect[0]).fold(f64::INFINITY, f64::min);
+    let lefts: Vec<f64> = block.rows.iter().map(left).collect();
+    assert!((lefts[0] - 108.0).abs() < 0.5, "the first row keeps its indent: {lefts:?}");
+    assert!(lefts.iter().skip(1).all(|x| (x - 72.0).abs() < 0.5), "the other rows at the left edge: {lefts:?}");
+}
+
+/// Thai edition: a Word Thai row set with a tightening character spacing (Word's own fit for its
+/// subset's glyphs), redrawn whole from the complete Thai face, doesn't take that spacing: the new
+/// letters were squeezed into one another.
+#[test]
+fn a_word_rows_tightening_is_not_given_to_its_redrawn_letters() {
+    if added::Family::Sarabun.craft(false, false).is_none() {
+        return; // built without craft-fonts
+    }
+    let unicode: &[u8] = b"1 beginbfrange <00d6> <00e7> <0e01> endbfrange";
+    let width = |spacing: &str| {
+        let mut doc = text_page(&format!("BT /F1 12 Tf {spacing} 72 700 Td <{}> Tj ET", legacy_thai_codes("กขค")));
+        let font = legacy_thai_font(&mut doc, "ABCDEF+WordThaiFace", &legacy_thai_program(), unicode);
+        doc.set(pdfcraft_cos::ObjRef::new(5, 0), Object::Dict(font));
+        let mut doc = reopen(&doc);
+        text::rewrite_block(&mut doc, 0, 0, Some("กขคเรียบร้อยดี"), &text::BlockStyle::default()).unwrap();
+        let lines = text::text_lines(&reopen(&doc), 0).unwrap();
+        lines.iter().map(|l| l.rect[2]).fold(f64::MIN, f64::max) - lines.iter().map(|l| l.rect[0]).fold(f64::MAX, f64::min)
+    };
+    let (plain, tight) = (width(""), width("-1.3 Tc"));
+    assert!((plain - tight).abs() < 0.5, "the redrawn letters aren't squeezed: {plain} vs {tight}");
+}
