@@ -4490,6 +4490,55 @@ fn replacing_text_through_tools() {
     assert!(matches!(a.call("text_replace", &json!({ "doc": doc, "find": "x", "replace": "y", "pages": [9] })), Err(ToolError::InvalidArgs(_))));
 }
 
+/// Thai edition: text_replace writes a letter a word processor's subset lacks from the complete
+/// face of the paragraph's own font (an Inter subset here, as TH Sarabun PSK for Word's Thai), and
+/// still skips a paragraph another family would have to draw (Inter for Helvetica).
+#[test]
+fn replacing_text_drawn_from_the_paragraphs_own_complete_face_through_tools() {
+    let dir = workdir("replace-own-face");
+    let program: &[u8] = include_bytes!("../../../../assets/fonts/Inter-Regular.ttf");
+    let content = "BT /F4 12 Tf 72 700 Td (Stable text) Tj ET BT /F1 12 Tf 72 500 Td (Helvetica text) Tj ET";
+    let widths = (32..=126).map(|_| "560").collect::<Vec<_>>().join(" ");
+    let mut objs: Vec<Vec<u8>> = vec![
+        b"<< /Type /Catalog /Pages 2 0 R >>".to_vec(),
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>".to_vec(),
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F4 6 0 R >> >> >>".to_vec(),
+        format!("<< /Length {} >>\nstream\n{content}\nendstream", content.len()).into_bytes(),
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>".to_vec(),
+        format!(
+            "<< /Type /Font /Subtype /TrueType /BaseFont /ABCDEF+Inter-Regular /Encoding /WinAnsiEncoding /FirstChar 32 /LastChar 126 /Widths [{widths}] /FontDescriptor 7 0 R >>"
+        )
+        .into_bytes(),
+        b"<< /Type /FontDescriptor /FontName /ABCDEF+Inter-Regular /FontFile2 8 0 R >>".to_vec(),
+    ];
+    let mut stream = format!("<< /Length {} >>\nstream\n", program.len()).into_bytes();
+    stream.extend_from_slice(program);
+    stream.extend_from_slice(b"\nendstream");
+    objs.push(stream);
+    let mut out = b"%PDF-1.7\n".to_vec();
+    let mut offsets = Vec::new();
+    for (i, o) in objs.iter().enumerate() {
+        offsets.push(out.len());
+        out.extend_from_slice(format!("{} 0 obj\n", i + 1).as_bytes());
+        out.extend_from_slice(o);
+        out.extend_from_slice(b"\nendobj\n");
+    }
+    let xref = out.len();
+    out.extend_from_slice(format!("xref\n0 {}\n0000000000 65535 f \n", objs.len() + 1).as_bytes());
+    for o in offsets {
+        out.extend_from_slice(format!("{o:010} 00000 n \n").as_bytes());
+    }
+    out.extend_from_slice(format!("trailer\n<< /Size {} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n", objs.len() + 1).as_bytes());
+    std::fs::write(dir.join("subset.pdf"), out).unwrap();
+    let mut a = auto(&dir);
+    let doc = ok(&mut a, "doc_open", json!({ "path": "subset.pdf" }))["doc"].as_u64().unwrap();
+    let r = ok(&mut a, "text_replace", json!({ "doc": doc, "find": "text", "replace": "\u{049B}\u{0438}\u{0437}" }));
+    assert_eq!((r["replaced"].as_u64(), r["skipped_by"]["missing_glyphs"].as_u64(), r["changed"].as_bool()), (Some(1), Some(1), Some(true)), "{r}");
+    let paragraphs = ok(&mut a, "text_paragraphs", json!({ "doc": doc, "page": 1 }));
+    let texts: Vec<&str> = paragraphs["paragraphs"].as_array().unwrap().iter().filter_map(|p| p["text"].as_str()).collect();
+    assert!(texts.contains(&"Stable \u{049B}\u{0438}\u{0437}") && texts.contains(&"Helvetica text"), "{texts:?}");
+}
+
 #[test]
 fn editing_existing_text_through_tools() {
     let dir = workdir("edit-text");

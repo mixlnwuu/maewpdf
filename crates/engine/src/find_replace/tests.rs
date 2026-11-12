@@ -339,3 +339,70 @@ fn nothing_to_find_is_refused() {
     let (s, id) = open(crate::tests::fixture(1));
     assert!(matches!(s.get(id).unwrap().plan_replace(&[0], &query("  ", "x"), Which::All, None), Err(EditError::Invalid(_))));
 }
+
+/// A one-page document with `content`: `F1` Helvetica and `F4` a subset of Inter embedded as a word
+/// processor writes it (`ABCDEF+Inter-Regular`, WinAnsi codes, the program inside).
+fn pdf_with_inter(content: &str) -> Vec<u8> {
+    let program: &[u8] = include_bytes!("../../../../assets/fonts/Inter-Regular.ttf");
+    let widths = (32..=126).map(|_| "560").collect::<Vec<_>>().join(" ");
+    let mut objs: Vec<Vec<u8>> = vec![
+        b"<< /Type /Catalog /Pages 2 0 R >>".to_vec(),
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>".to_vec(),
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F4 6 0 R >> >> >>".to_vec(),
+        format!("<< /Length {} >>\nstream\n{content}\nendstream", content.len()).into_bytes(),
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>".to_vec(),
+        format!(
+            "<< /Type /Font /Subtype /TrueType /BaseFont /ABCDEF+Inter-Regular /Encoding /WinAnsiEncoding /FirstChar 32 /LastChar 126 /Widths [{widths}] /FontDescriptor 7 0 R >>"
+        )
+        .into_bytes(),
+        b"<< /Type /FontDescriptor /FontName /ABCDEF+Inter-Regular /FontFile2 8 0 R >>".to_vec(),
+    ];
+    let mut stream = format!("<< /Length {} >>\nstream\n", program.len()).into_bytes();
+    stream.extend_from_slice(program);
+    stream.extend_from_slice(b"\nendstream");
+    objs.push(stream);
+    let mut out = b"%PDF-1.7\n".to_vec();
+    let mut offsets = Vec::new();
+    for (i, o) in objs.iter().enumerate() {
+        offsets.push(out.len());
+        out.extend_from_slice(format!("{} 0 obj\n", i + 1).as_bytes());
+        out.extend_from_slice(o);
+        out.extend_from_slice(b"\nendobj\n");
+    }
+    let xref = out.len();
+    out.extend_from_slice(format!("xref\n0 {}\n0000000000 65535 f \n", objs.len() + 1).as_bytes());
+    for o in offsets {
+        out.extend_from_slice(format!("{o:010} 00000 n \n").as_bytes());
+    }
+    out.extend_from_slice(format!("trailer\n<< /Size {} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n", objs.len() + 1).as_bytes());
+    out
+}
+
+/// Thai edition: letters a word processor's subset lacks are drawn from the complete face of the
+/// paragraph's own font (here Inter's for an Inter subset, as TH Sarabun PSK's for a THSarabunPSK
+/// subset from Word): the same font, so the match is replaced. A paragraph whose letters another
+/// family would draw (Inter standing in for Helvetica) is still skipped and counted.
+#[test]
+fn a_letter_drawn_from_the_paragraphs_own_complete_face_is_replaced() {
+    let content = "BT /F4 12 Tf 72 700 Td (Stable text) Tj ET BT /F1 12 Tf 72 500 Td (Helvetica text) Tj ET";
+    let (mut s, id) = open(pdf_with_inter(content));
+    assert_eq!(texts(&s, id, 0), ["Stable text", "Helvetica text"]);
+    let plan = replace_all(&mut s, id, &query("text", "\u{049B}\u{0438}\u{0437}\u{0438}\u{043B}"));
+    assert_eq!(plan.replaced, 1, "{plan:?}");
+    assert_eq!(plan.skipped, BTreeMap::from([(Skip::MissingGlyphs, 1)]));
+    assert_eq!(texts(&s, id, 0), ["Stable \u{049B}\u{0438}\u{0437}\u{0438}\u{043B}", "Helvetica text"]);
+}
+
+/// Thai edition: a paragraph that needs its own complete face and another family as well is
+/// skipped: every family that stands in must be the paragraph's own.
+#[test]
+fn own_family_stands_in_only_when_every_substitute_is_the_paragraphs_family() {
+    let (s, id) = open(pdf_with_inter("BT /F4 12 Tf 72 700 Td (Stable text) Tj ET"));
+    let doc = s.get(id).unwrap();
+    let cos = &doc.editor.as_ref().unwrap().cos;
+    let block = pdfcraft_edit::text_blocks(cos, 0).unwrap().remove(0);
+    assert!(own_family_stands_in("Inter Type3", cos, 0, &block, &[std::ops::Range { start: 7, end: 11 }]));
+    assert!(!own_family_stands_in("Inter Type3 + BIZ UDPGothic Type3", cos, 0, &block, &[std::ops::Range { start: 7, end: 11 }]));
+    assert!(!own_family_stands_in("Helvetica", cos, 0, &block, &[std::ops::Range { start: 7, end: 11 }]));
+    assert!(!own_family_stands_in("", cos, 0, &block, &[std::ops::Range { start: 7, end: 11 }]));
+}

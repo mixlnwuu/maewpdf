@@ -138,7 +138,9 @@ impl CharacterPreparation<'_> {
         // character (Thai edition).
         let mut own_names: HashMap<(String, char), String> = HashMap::new();
         let mut chars = Vec::new();
-        let mut substituted = None;
+        // Every family that stands in, not only the last (Thai edition): Find & Replace accepts
+        // the paragraph's own family drawn from its complete face, and no other.
+        let mut substituted: Vec<String> = Vec::new();
         let mut fallback = FallbackBuilder::new(max_glyphs);
         let mut resolver = FontResolver { doc, fonts, metrics, full_faces: HashMap::new(), programs: HashMap::new() };
         for (range, index) in spans {
@@ -196,7 +198,10 @@ impl CharacterPreparation<'_> {
                     fallback.prepare(source, ch, &text, chars.len())?
                 } else {
                     let name = resolver.substitute_font(source);
-                    substituted = Some(source_family(&source.base_font).base_font(source.bold, source.italic).to_owned());
+                    let family = source_family(&source.base_font).base_font(source.bold, source.italic).to_owned();
+                    if !substituted.contains(&family) {
+                        substituted.push(family);
+                    }
                     name
                 };
                 chars.push((ch, index, name));
@@ -217,8 +222,12 @@ impl CharacterPreparation<'_> {
                 let (font, _) = written.codes.get(&item.0).ok_or_else(|| EditError::Invalid("the fallback glyph is missing".into()))?;
                 item.2 = written.names.get(*font).cloned().ok_or_else(|| EditError::Invalid("the fallback font is missing".into()))?;
             }
-            substituted = Some(written.family.to_owned());
+            let family = written.family.to_owned();
+            if !substituted.contains(&family) {
+                substituted.push(family);
+            }
         }
+        let substituted = (!substituted.is_empty()).then(|| substituted.join(" + "));
         Ok(PreparedCharacters { values: chars, substituted })
     }
 }

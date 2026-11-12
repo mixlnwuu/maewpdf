@@ -36,6 +36,35 @@ pub struct Replace {
     pub whole_words: bool,
 }
 
+/// Whether every family `substituted` names (joined with " + ") is the family of the font of a run
+/// a replacement lands in (Thai edition): the run that holds the start of each of the matches
+/// `ranges` in the paragraph `block` ("TH Sarabun PSK Type3" for `ABCDEF+THSarabunPSK`, "Angsana
+/// New Type3" for `AngsanaNew-Bold`). Names are compared without subset tag, style, spaces or case.
+fn own_family_stands_in(
+    substituted: &str,
+    doc: &pdfcraft_cos::Document,
+    page: usize,
+    block: &pdfcraft_edit::TextBlock,
+    ranges: &[Range<usize>],
+) -> bool {
+    fn family(name: &str) -> String {
+        let name = name.split_once('+').map_or(name, |(tag, rest)| if tag.len() == 6 { rest } else { name });
+        let name = name.trim_end_matches(" Type3");
+        let name = name.split(['-', ',']).next().unwrap_or(name);
+        name.chars().filter(|c| c.is_alphanumeric()).flat_map(char::to_lowercase).collect()
+    }
+    let lines = pdfcraft_edit::text_lines(doc, page).unwrap_or_default();
+    // A character no span covers belongs to the run that follows it, as the replacement does.
+    let landing = ranges.iter().filter_map(|r| block.spans.iter().find(|(span, _)| span.end > r.start).map(|(_, source)| *source));
+    let fonts: Vec<&str> = landing.filter_map(|i| lines.get(i)).map(|l| l.base_font.as_str()).collect();
+    let fonts = if fonts.is_empty() { vec![block.base_font.as_str()] } else { fonts };
+    let own: Vec<String> = fonts.into_iter().map(family).filter(|f| !f.is_empty()).collect();
+    substituted.split(" + ").all(|s| {
+        let s = family(s);
+        !s.is_empty() && own.contains(&s)
+    })
+}
+
 /// Which matches to replace.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Which {
@@ -235,8 +264,16 @@ impl Document {
                 }
                 let style = pdfcraft_edit::BlockStyle { sources, ..Default::default() };
                 let mut trial = work.clone();
-                match guard(|| pdfcraft_edit::rewrite_block(&mut trial, page, k, Some(&text), &style)) {
-                    Ok(Ok(pdfcraft_edit::LineEdit { substituted: None })) => {
+                let edited = guard(|| pdfcraft_edit::rewrite_block(&mut trial, page, k, Some(&text), &style));
+                // Thai edition: letters a subset embedded by a word processor lacks are drawn from the
+                // complete face of the paragraph's own font (TH Sarabun PSK, Angsana New): the same
+                // font, so the match is replaced. Any other family standing in still skips it.
+                let drawable = match &edited {
+                    Ok(Ok(e)) => e.substituted.as_deref().is_none_or(|s| own_family_stands_in(s, &work, page, block, &ranges)),
+                    _ => false,
+                };
+                match edited {
+                    Ok(Ok(_)) if drawable => {
                         work = trial;
                         rewrote = true;
                         edits.push(Edit::EditTextBlock { page, block: k, text, style });
@@ -245,7 +282,7 @@ impl Document {
                             out.pages.push(page);
                         }
                     }
-                    Ok(Ok(pdfcraft_edit::LineEdit { substituted: Some(_) })) => out.skip(Skip::MissingGlyphs, count),
+                    Ok(Ok(_)) => out.skip(Skip::MissingGlyphs, count),
                     Ok(Err(e)) => refused(&mut out, count, page, e.to_string()),
                     Err(panic) => refused(&mut out, count, page, panic),
                 }

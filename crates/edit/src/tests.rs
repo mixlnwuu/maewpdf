@@ -16393,3 +16393,69 @@ fn a_font_for_a_paragraph_of_several_colours_keeps_each_colour() {
     assert!(lines.iter().all(|l| l.bold), "in the face chosen: {lines:?}");
     assert_eq!(text::text_blocks(&doc, 0).unwrap()[0].rows.len(), 1, "one row still");
 }
+
+/// The glyph codes `legacy_thai_program` gives Thai text (as Word's THSarabunPSK subsets number it).
+fn legacy_thai_codes(text: &str) -> String {
+    let code = |c: char| match u32::from(c) {
+        0x0E48 => 0x0160,
+        0x0E49 => 0x0161,
+        c @ 0x0E01..=0x0E3A => c - 0x0E01 + 0x00D6,
+        c => c - 0x0E3F + 0x0110,
+    };
+    text.chars().map(|c| format!("{:04x}", code(c))).collect()
+}
+
+/// Thai edition: typing into a Word Thai paragraph of several colours keeps each part's colour.
+/// The paragraph is redrawn shaped from the complete Thai face, and that path drew all of it in its
+/// first part's colour: an orange first word turned the whole paragraph orange.
+#[test]
+fn typing_into_a_thai_paragraph_of_several_colours_keeps_each_colour() {
+    if added::Family::Sarabun.craft(false, false).is_none() {
+        return; // built without craft-fonts
+    }
+    let text = "ไม่มีริ้วรอย";
+    let mut doc = text_page(&format!("BT /F1 12 Tf 72 700 Td <{}> Tj ET", legacy_thai_codes(text)));
+    let font = legacy_thai_font(&mut doc, "ABCDEF+THSarabunPSK", &legacy_thai_program(), LEGACY_THAI_UNICODE);
+    doc.set(pdfcraft_cos::ObjRef::new(5, 0), Object::Dict(font));
+    let orange = [1.0, 0.5, 0.0];
+    let coloured = text::BlockStyle {
+        ranges: vec![text::RangeStyle {
+            range: 0.."ไม่มี".len(),
+            family: None,
+            resource: None,
+            size: None,
+            color: Some(orange),
+            underline: None,
+            char_spacing: None,
+            scale: None,
+        }],
+        ..Default::default()
+    };
+    text::rewrite_block(&mut doc, 0, 0, Some(text), &coloured).unwrap();
+    let mut doc = reopen(&doc);
+    text::rewrite_block(&mut doc, 0, 0, Some("ไม่มีริ้วรอยเลย"), &text::BlockStyle::default()).unwrap();
+    let doc = reopen(&doc);
+    let lines = text::text_lines(&doc, 0).unwrap();
+    let in_colour = |c: [f64; 3]| lines.iter().filter(|l| l.color == c).map(|l| l.text.as_str()).collect::<String>();
+    assert_eq!((in_colour(orange), in_colour([0.0; 3])), ("ไม่มี".to_owned(), "ริ้วรอยเลย".to_owned()), "{lines:?}");
+}
+
+/// Thai edition: a Word Thai paragraph of one row in two runs grows to the right when typed into,
+/// as a one-run row does. It was rewrapped at its old width, and the new row fell below, where
+/// Word's clip on each line hid it: the words typed at the end were gone.
+#[test]
+fn a_thai_row_of_two_runs_grows_to_the_right_when_typed_into() {
+    let first = "ใช้งานได้";
+    // A Thai run, then a Latin one in another font on the same baseline.
+    let mut doc = text_page(&format!("BT /F1 12 Tf 72 700 Td <{}> Tj /F4 12 Tf ( 2024) Tj ET", legacy_thai_codes(first)));
+    let font = legacy_thai_font(&mut doc, "ABCDEF+THSarabunPSK", &legacy_thai_program(), LEGACY_THAI_UNICODE);
+    doc.set(pdfcraft_cos::ObjRef::new(5, 0), Object::Dict(font));
+    let mut doc = reopen(&doc);
+    let block = text::text_blocks(&doc, 0).unwrap().remove(0);
+    assert_eq!((block.lines.len(), block.rows.len()), (2, 1), "one row of two runs: {block:?}");
+    let typed = format!("{first} 2024 เรียบร้อยดีมากที่สุดแล้วจริงๆ");
+    text::rewrite_block(&mut doc, 0, 0, Some(&typed), &text::BlockStyle::default()).unwrap();
+    let block = text::text_blocks(&reopen(&doc), 0).unwrap().remove(0);
+    assert_eq!(block.rows.len(), 1, "still one row, grown to the right: {block:?}");
+    assert_eq!(block.text, typed);
+}

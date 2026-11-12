@@ -310,7 +310,7 @@ fn choose_rewrite_path(
             && !hebrew
             && !visual_indic
             && ((!thai_fallback && (explicit_styled_text || (source_requires_styled_path && !face_changes)))
-                || (face_changes && parts_keep_their_look)),
+                || ((face_changes || thai_fallback) && parts_keep_their_look)),
     })
 }
 
@@ -1060,7 +1060,10 @@ pub(crate) fn rewrite_block_from(
     // Turned text is left alone: its centre lives along its own baseline, not in page space.
     let crop = p.crop(doc);
     let centred = upright && !rtl && style.width.is_none() && style.align.is_none() && is_centred(&b, &lines, (crop[0] + crop[2]) / 2.0, first.size);
-    let geometry = ParaGeometry { rect: b.rect, frame, crop, upright, k, size, dx, single_line: members.len() == 1, anchored_right, centred };
+    // One row of several runs is one line too (Thai edition: Thai a Word subset can't draw comes
+    // here, not to the styled path, which grows such a row the same way).
+    let single_line = members.len() == 1 || b.rows.len() == 1;
+    let geometry = ParaGeometry { rect: b.rect, frame, crop, upright, k, size, dx, single_line, anchored_right, centred };
     let width = geometry.width(style.width)?;
     let align = if centred { Some(crate::added::Align::Center) } else { style.align.or(rtl.then_some(crate::added::Align::Right)) };
     // Where a right-aligned line ends, from the paragraph's left edge (user space).
