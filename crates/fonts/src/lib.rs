@@ -38,7 +38,7 @@ pub use shaping::{
     ShapedCluster, ShapedScript, arabic_glyph, arabic_has, document_family_font, face_glyph, face_has as script_face_has, hebrew_has, shape_arabic,
     shape_face, shape_hebrew, shape_thai, shaped_glyph, thai_has,
 };
-pub use std14::Std14;
+pub use std14::{Match as Std14Match, Std14};
 
 /// Advance of `s` in Helvetica at `size` points, using the exact standard-14 metrics.
 ///

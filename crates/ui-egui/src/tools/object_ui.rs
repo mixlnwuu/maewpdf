@@ -9,6 +9,7 @@ use pdfcraft_render::DocInfo;
 
 use crate::canvas::{DocView, PageToolContext, PageXform};
 use crate::page_cursor::Layer;
+use crate::page_keys::PageKeys;
 use crate::page_router::{Hit, ObjectsPart, Owner, PagePress, ParagraphPart};
 
 const BLUE: Color32 = Color32::from_rgb(0x14, 0x73, 0xE6);
@@ -176,7 +177,7 @@ impl ObjectSelection {
         self.select_paragraph = Some((page, block));
     }
 
-    pub fn prepare(&mut self, doc: &Document, enabled: bool, ctx: &egui::Context) {
+    pub fn prepare(&mut self, doc: &Document, enabled: bool, ctx: &egui::Context, keys: PageKeys) {
         self.hold_editor = false;
         if !enabled {
             self.clear();
@@ -220,7 +221,7 @@ impl ObjectSelection {
             self.pending = None;
             self.restyled = false;
         }
-        if self.page.is_some() && ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape)) {
+        if self.page.is_some() && keys.take(ctx, egui::Key::Escape) {
             self.clear();
         }
         // After the Escape check: the Esc that closed the editor must not clear what it selected.
@@ -273,8 +274,8 @@ fn refind_restyled(inventory: &[EditableObject], expected: &[EditableObject]) ->
 /// look (one box, or every box clicked while it is kept); Esc puts it down. `true` when it took
 /// the pointer.
 fn painter_input(cx: PageToolContext<'_>, view: &mut DocView) -> bool {
-    let PageToolContext { ui, resp, xf, ptr, page, doc, .. } = cx;
-    if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape)) {
+    let PageToolContext { ui, resp, xf, ptr, page, doc, keys, .. } = cx;
+    if keys.take(ui.ctx(), egui::Key::Escape) {
         view.format_painter = None;
         return true;
     }
@@ -649,8 +650,7 @@ pub(crate) fn page_input(cx: PageToolContext<'_>, press: PagePress, view: &mut D
         && view.pending_edit.is_none()
         && !ui.ctx().egui_wants_keyboard_input()
     {
-        let deleted =
-            ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Delete) || i.consume_key(egui::Modifiers::NONE, egui::Key::Backspace));
+        let deleted = cx.keys.take(ui.ctx(), egui::Key::Delete) || cx.keys.take(ui.ctx(), egui::Key::Backspace);
         if deleted {
             view.pending_edit = delete_edit_in(cx.doc, page, view.objects.selected.iter().map(|o| o.target).collect());
             return true;
@@ -800,7 +800,7 @@ fn on_frame(r: Rect, p: Pos2) -> bool {
 
 /// The arrow keys move the selected image or objects a point, Shift and an arrow ten points,
 /// as in Acrobat. They are taken before the view turns the page with them.
-pub(crate) fn nudge_keys(ctx: &egui::Context, view: &mut DocView, doc: &Document) {
+pub(crate) fn nudge_keys(ctx: &egui::Context, keys: PageKeys, view: &mut DocView, doc: &Document) {
     if ctx.egui_wants_keyboard_input() || view.pending_edit.is_some() {
         return;
     }
@@ -810,26 +810,23 @@ pub(crate) fn nudge_keys(ctx: &egui::Context, view: &mut DocView, doc: &Document
     let Some(xf) = view.page_xform(page) else { return };
     use egui::Key;
     let mut step = egui::Vec2::ZERO;
-    ctx.input_mut(|i| {
-        // Only an arrow pressed alone or with Shift, judged by each press's own modifiers (the
-        // frame's can differ when a key is let go in the same frame). Alt+← / Alt+→ go back and
-        // forward through the view history (#3632) and Ctrl/⌘+← / → turn the page, both in
-        // `canvas::shortcuts`.
-        i.events.retain(|e| {
-            let egui::Event::Key { key, pressed: true, modifiers, .. } = e else { return true };
-            if modifiers.alt || modifiers.ctrl || modifiers.command || modifiers.mac_cmd {
-                return true;
-            }
-            let direction = match key {
-                Key::ArrowLeft => egui::vec2(-1.0, 0.0),
-                Key::ArrowRight => egui::vec2(1.0, 0.0),
-                Key::ArrowUp => egui::vec2(0.0, -1.0),
-                Key::ArrowDown => egui::vec2(0.0, 1.0),
-                _ => return true,
-            };
-            step += direction * if modifiers.shift { 10.0 } else { 1.0 };
-            false
-        });
+    // Only an arrow pressed alone or with Shift, judged by each press's own modifiers (the
+    // frame's can differ when a key is let go in the same frame). Alt+← / Alt+→ go back and
+    // forward through the view history (#3632) and Ctrl/⌘+← / → turn the page, both in
+    // `canvas::shortcuts`.
+    keys.take_presses(ctx, |key, modifiers| {
+        if modifiers.alt || modifiers.ctrl || modifiers.command || modifiers.mac_cmd {
+            return false;
+        }
+        let direction = match key {
+            Key::ArrowLeft => egui::vec2(-1.0, 0.0),
+            Key::ArrowRight => egui::vec2(1.0, 0.0),
+            Key::ArrowUp => egui::vec2(0.0, -1.0),
+            Key::ArrowDown => egui::vec2(0.0, 1.0),
+            _ => return false,
+        };
+        step += direction * if modifiers.shift { 10.0 } else { 1.0 };
+        true
     });
     if step == egui::Vec2::ZERO {
         return;
@@ -870,11 +867,11 @@ fn arrange_edit(view: &DocView, how: pdfcraft_engine::Arrange) -> Option<Edit> {
 
 /// Ctrl+] / Ctrl+[ (with Shift: to the front or back) arrange the one object selected in Edit text
 /// & images, as they do an added item (Thai edition).
-pub(crate) fn arrange_keys(ctx: &egui::Context, view: &mut DocView) {
+pub(crate) fn arrange_keys(ctx: &egui::Context, keys: PageKeys, view: &mut DocView) {
     if ctx.egui_wants_keyboard_input() || view.pending_edit.is_some() || view.line_editor.is_some() || view.objects.gesture.is_some() {
         return;
     }
-    if let Some(how) = crate::content_ui::arrange_key(ctx)
+    if let Some(how) = crate::content_ui::arrange_key(ctx, keys)
         && let Some(edit) = arrange_edit(view, how)
     {
         view.pending_edit = Some(edit);
@@ -929,13 +926,13 @@ pub(crate) fn select_all(view: &mut DocView, doc: &Document, page: usize) -> boo
     true
 }
 
-pub(crate) fn delete_keys(ctx: &egui::Context, view: &mut DocView, doc: &Document) {
+pub(crate) fn delete_keys(ctx: &egui::Context, keys: PageKeys, view: &mut DocView, doc: &Document) {
     if ctx.egui_wants_keyboard_input() || view.pending_edit.is_some() || view.objects.gesture.is_some() {
         return;
     }
     let Some(page) = view.objects.page.filter(|_| !view.objects.selected.is_empty()) else { return };
-    use egui::{Key, Modifiers};
-    if !ctx.input_mut(|i| i.consume_key(Modifiers::NONE, Key::Delete) || i.consume_key(Modifiers::NONE, Key::Backspace)) {
+    use egui::Key;
+    if !(keys.take(ctx, Key::Delete) || keys.take(ctx, Key::Backspace)) {
         return;
     }
     // The selection stays until the edit applies: `prepare` clears it when the document changes,
@@ -1513,7 +1510,11 @@ below"
             },
             |ui| {
                 let resp = ui.interact(ui.available_rect_before_wrap(), egui::Id::unique("page"), egui::Sense::click());
-                page_input(PageToolContext { ui, resp: &resp, xf: &xf, ptr: &ptr, page: 0, doc, info: &info }, PagePress::Free, &mut view);
+                page_input(
+                    PageToolContext { ui, resp: &resp, xf: &xf, ptr: &ptr, page: 0, doc, info: &info, keys: Default::default() },
+                    PagePress::Free,
+                    &mut view,
+                );
             },
         );
         output.textures_delta.clear();

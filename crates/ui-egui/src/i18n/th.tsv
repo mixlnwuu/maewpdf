@@ -3112,3 +3112,68 @@ theme	Appearance	ลักษณะที่ปรากฏ
 	Cover the background	สี่เหลี่ยมปิดพื้นหลัง
 	Pick the colour from the page	ดูดสีจากหน้า
 	Fonts in this file	แบบอักษรในไฟล์นี้
+	A script edited here can be at most 256 KiB long; that change wasn't made.	สคริปต์ที่แก้ตรงนี้ยาวได้ไม่เกิน 256 KiB จึงไม่ได้เปลี่ยนตามที่แก้
+	Add a paper size of your own to the list	เพิ่มขนาดกระดาษของคุณเองลงในรายการ
+	All marks	เครื่องหมายทั้งหมด
+	Bleed marks	เครื่องหมายระยะตัดตก
+	By the standard device formulas; profiles are not applied.	ใช้สูตรมาตรฐานของอุปกรณ์ ไม่ใช้โปรไฟล์สี
+	CMYK	CMYK
+	Colour bars	แถบสี
+	Comments and form fields	ความคิดเห็นและช่องฟอร์ม
+	Convert colours	แปลงสี
+	Convert to	แปลงเป็น
+	Creep:	ระยะเลื่อนเข้าสัน:
+	Custom calculation script:	สคริปต์คำนวณแบบกำหนดเอง:
+	Custom…	กำหนดเอง…
+	Detecting paper…	กำลังตรวจหากระดาษ…
+	Detecting…	กำลังตรวจหา…
+	Discard embedded search index	ทิ้งดัชนีค้นหาที่ฝังไว้
+	Discard external cross-references	ทิ้งการอ้างอิงไปยังไฟล์ภายนอก
+	Document: {name}	เอกสาร: {name}
+	Edit attachment description	แก้ไขคำอธิบายไฟล์แนบ
+	Edit description	แก้ไขคำอธิบาย
+	Grayscale	ระดับสีเทา
+	Its {standard} identification couldn't be kept, so the file no longer says it conforms to {standard}.	เก็บการระบุ {standard} ไว้ไม่ได้ ไฟล์จึงไม่ได้ระบุว่าเป็นไปตาม {standard} แล้ว
+	Its {standard} identification was written back on its own.	เขียนการระบุ {standard} กลับเข้าไปแยกต่างหากแล้ว
+	Line weight	ความหนาเส้น
+	Marks	เครื่องหมาย
+	Moves each sheet's pages toward the fold by this much more than the sheet outside it, so the margins match once the booklet is folded and trimmed.	เลื่อนหน้าของกระดาษแต่ละแผ่นเข้าหารอยพับมากกว่าแผ่นที่อยู่ด้านนอกเท่าค่านี้ เพื่อให้ขอบตรงกันเมื่อพับและตัดเล่มแล้ว
+	No matches to replace	ไม่พบข้อความที่จะแทนที่
+	Not replaced: {why}	ไม่ได้แทนที่: {why}
+	Nothing replaced	ไม่มีอะไรถูกแทนที่
+	PDF/A and PDF/UA	PDF/A และ PDF/UA
+	Page Setup…	ตั้งค่าหน้ากระดาษ…
+	Page information	ข้อมูลหน้า
+	Page setup dialog is not available on this system.	ระบบนี้ไม่มีหน้าต่างตั้งค่าหน้ากระดาษ
+	Pictures too	รวมรูปภาพด้วย
+	Preserve black	คงสีดำไว้
+	Print area…	พื้นที่พิมพ์…
+	RGB	RGB
+	Registration marks	เครื่องหมายจัดตำแหน่ง
+	Replace ({key})	แทนที่ ({key})
+	Replace all	แทนที่ทั้งหมด
+	Replace with	แทนที่ด้วย
+	Replaced {n} on {pages}	แทนที่แล้ว {n} แห่งใน{pages}
+	Room on each side	ระยะว่างแต่ละด้าน
+	Save as image	บันทึกเป็นรูปภาพ
+	Save as image…	บันทึกเป็นรูปภาพ…
+	Selected area (page {page}, {size})	พื้นที่ที่เลือก (หน้า {page}, {size})
+	Selects paper size and orientation from the printer driver. For paper tray, print quality or other driver defaults, use Properties…	เลือกขนาดและแนวกระดาษจากไดรเวอร์เครื่องพิมพ์ ส่วนถาดกระดาษ คุณภาพการพิมพ์ หรือค่าเริ่มต้นอื่นของไดรเวอร์ ให้ใช้ คุณสมบัติ…
+	Take this paper size off the list	เอาขนาดกระดาษนี้ออกจากรายการ
+	The creep moves the innermost sheet's pages too far for this many pages. Reduce Creep.	ระยะเลื่อนเข้าสันทำให้หน้าของแผ่นในสุดเลื่อนไกลเกินไปสำหรับจำนวนหน้าเท่านี้ ลดระยะเลื่อนเข้าสันลง
+	The document changed. Reopen Document Properties to edit the current version.	เอกสารเปลี่ยนไปแล้ว เปิดคุณสมบัติเอกสารใหม่เพื่อแก้ไขฉบับปัจจุบัน
+	The document's XMP metadata held the redacted text and was removed.	ข้อมูลเมตา XMP ของเอกสารมีข้อความที่ลบทึบไว้ จึงถูกนำออกแล้ว
+	The trim box is kept where it is, so the printed page cuts the same.	กรอบตัดเจียนอยู่ที่เดิม หน้าที่พิมพ์จึงตัดได้เหมือนเดิม
+	This document's script is asking	สคริปต์ของเอกสารนี้กำลังถาม
+	This request comes from the document, not PdfCraft. Only enter a password if you trust this document.	คำขอนี้มาจากเอกสาร ไม่ใช่จาก PdfCraft ใส่รหัสผ่านเฉพาะเมื่อคุณไว้ใจเอกสารนี้
+	This script is too long to edit here ({kib} KiB); its start is shown. It is kept as it is.	สคริปต์นี้ยาวเกินกว่าจะแก้ตรงนี้ ({kib} KiB) จึงแสดงเฉพาะช่วงต้น และเก็บไว้ตามเดิม
+	Trim marks	เครื่องหมายตัดเจียน
+	Widen the page to make room	ขยายหน้าให้มีที่ว่าง
+	printer marks	เครื่องหมายสำหรับโรงพิมพ์
+	pure black stays 100% K or gray 0 instead of a mix	สีดำล้วนคงเป็น K 100% หรือเทา 0 แทนที่จะเป็นสีผสม
+	re-encoded in the target space; JPEGs stay JPEG	เข้ารหัสใหม่ในปริภูมิสีปลายทาง ไฟล์ JPEG ยังคงเป็น JPEG
+	their appearances as well as the page	ทั้งลักษณะที่แสดงของรายการเหล่านั้นและตัวหน้า
+	{k} skipped: {why}	ข้ามไป {k} แห่ง: {why}
+	{list} and {last}	{list} และ {last}
+	{why} ({n})	{why} ({n})
+	Replace…	แทนที่…

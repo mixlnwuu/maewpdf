@@ -125,6 +125,13 @@ pub(crate) struct Updates {
     ready: Option<PathBuf>,
 }
 
+impl Updates {
+    /// The prompt that offers a newer release is open over the window.
+    pub(crate) fn prompt_open(&self) -> bool {
+        self.prompt.is_some()
+    }
+}
+
 /// A newer release being offered.
 struct Prompt {
     release: Release,

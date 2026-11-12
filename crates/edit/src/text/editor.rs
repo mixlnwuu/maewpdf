@@ -68,7 +68,7 @@ pub fn text_editor_fonts(doc: &Document, page: usize) -> Result<Vec<TextEditorFo
         }
         result.push(TextEditorFont {
             resource: String::from_utf8_lossy(name).into_owned(),
-            face: Metrics::from_dict(doc, &font).base_font.rsplit('+').next().unwrap_or_default().to_owned(),
+            face: pdfcraft_fonts::pdf::base_font_name(doc, &font).rsplit('+').next().unwrap_or_default().to_owned(),
             bytes,
             choice_only: false,
         });
